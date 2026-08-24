@@ -1,0 +1,361 @@
+:root {
+  --herp-forest: #1f3d2b;
+  --herp-moss: #7a9b6d;
+  --herp-sand: #d4c5a9;
+  --herp-amber: #c9a227;
+  --herp-ink: #1a241d;
+  --herp-paper: #f7f4ec;
+  --herp-card: #ffffff;
+  --herp-border: #e0d9c8;
+  --herp-shadow: 0 8px 24px rgba(31, 61, 43, 0.08);
+  color: var(--herp-ink);
+  background: var(--herp-paper);
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(122, 155, 109, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba(201, 162, 39, 0.05), transparent 45%),
+    var(--herp-paper);
+}
+
+.app-mobile-layout {
+  min-height: 100vh;
+}
+
+.app-mobile-layout > .adm-tab-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  background: rgba(247, 244, 236, 0.92);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--herp-border);
+}
+
+.app-desktop-layout {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.app-desktop-layout .ant-layout-sider {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  background: var(--herp-card) !important;
+  border-right: 1px solid var(--herp-border);
+}
+
+.app-desktop-header {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: rgba(247, 244, 236, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--herp-border);
+}
+
+.app-desktop-header .ant-typography {
+  margin: 0;
+  color: var(--herp-forest);
+}
+
+.app-brand {
+  height: 72px;
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--herp-border);
+}
+
+.app-brand .ant-typography {
+  color: var(--herp-forest);
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+.app-desktop-layout .ant-layout-content {
+  min-width: 0;
+}
+
+.app-mobile-content {
+  padding: 12px 12px calc(72px + env(safe-area-inset-bottom));
+}
+
+.app-desktop-content {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .app-mobile-content {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px 20px calc(72px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 992px) {
+  .app-mobile-content {
+    padding: 0;
+  }
+}
+
+.eyebrow {
+  color: var(--herp-moss);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.pet-page-intro,
+.record-page-intro,
+.dashboard-intro {
+  padding: 8px 4px 4px;
+}
+
+.pet-page-intro h1,
+.record-page-intro h1,
+.dashboard-intro h1 {
+  margin: 5px 0 3px;
+  color: var(--herp-forest);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.pet-page-intro p,
+.record-page-intro p,
+.dashboard-intro p {
+  margin: 0;
+  color: #68766a;
+  font-size: 14px;
+}
+
+.pet-card-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.pet-profile-card {
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+}
+
+.pet-profile-image {
+  display: block;
+  width: 100%;
+  height: 168px;
+}
+
+.pet-profile-body {
+  padding: 14px;
+}
+
+.pet-profile-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pet-profile-heading h2 {
+  margin: 0 0 3px;
+  color: var(--herp-forest);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 22px;
+}
+
+.pet-profile-heading span,
+.pet-profile-meta {
+  color: #68766a;
+  font-size: 13px;
+}
+
+.pet-profile-meta {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--herp-border);
+}
+
+.pet-detail-sheet {
+  max-height: 88vh;
+  overflow-y: auto;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.pet-detail-image {
+  display: block;
+  width: 100%;
+  height: 190px;
+}
+
+.pet-detail-sheet > .adm-space {
+  padding: 20px 16px 0;
+}
+
+.pet-detail-sheet h2 {
+  margin: 5px 0 2px;
+  color: var(--herp-forest);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 28px;
+}
+
+.pet-detail-sheet p {
+  margin: 0;
+  color: #68766a;
+}
+
+.record-context-card {
+  background: var(--herp-forest);
+  border-color: var(--herp-forest);
+  color: #fff;
+}
+
+.record-context {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.record-pet-image {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+}
+
+.record-context-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.record-context-copy span,
+.record-context-copy small {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+.record-context-copy strong {
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 21px;
+}
+
+.record-context .adm-button {
+  color: var(--herp-sand);
+}
+
+.record-action-hint {
+  margin: 0 0 16px;
+  color: #68766a;
+  font-size: 13px;
+}
+
+.record-choice-row {
+  display: flex;
+  gap: 8px;
+}
+
+.record-choice-row .adm-button {
+  flex: 1;
+}
+
+.dashboard-health-lead {
+  margin-bottom: 18px;
+  color: var(--herp-forest);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 22px;
+}
+
+.dashboard-purpose {
+  margin: 0;
+  color: #68766a;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* antd-mobile theme overrides */
+.adm-card {
+  border-radius: 14px;
+  box-shadow: var(--herp-shadow);
+  border: 1px solid var(--herp-border);
+  background: var(--herp-card);
+}
+
+.adm-card-header-title {
+  color: var(--herp-forest);
+  font-weight: 600;
+}
+
+.adm-list-item-content-main {
+  color: var(--herp-ink);
+}
+
+.adm-list-item-description {
+  color: #5c6b60;
+}
+
+.adm-button-primary {
+  background: var(--herp-forest);
+  border-color: var(--herp-forest);
+}
+
+.adm-button-primary:active {
+  background: #16301f;
+}
+
+.adm-tag {
+  border-radius: 6px;
+}
+
+.adm-selector-item {
+  border-radius: 10px;
+  border: 1px solid var(--herp-border);
+}
+
+.adm-selector-item-active {
+  background: var(--herp-forest);
+  border-color: var(--herp-forest);
+  color: #fff;
+}
+
+.adm-popup {
+  background: var(--herp-paper);
+}
+
+/* antd theme overrides */
+.ant-layout {
+  background: transparent;
+}
+
+.ant-menu {
+  background: transparent;
+}
+
+.ant-menu-item-selected {
+  background: rgba(31, 61, 43, 0.08) !important;
+  color: var(--herp-forest) !important;
+}
+
+.ant-menu-item:hover {
+  color: var(--herp-forest) !important;
+}
