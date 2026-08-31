@@ -298,7 +298,9 @@ git commit -m "feat: 定义认证请求与响应序列化器"
 - Produces `get_user_by_uuid(session, user_uuid) -> User | None`。
 - Produces `get_refresh_token_by_hash(session, token_hash) -> RefreshToken | None`，仅用于认证凭证精确查找，不作为普通资源查询。
 - Produces `register_user(session, request) -> User`。
+- Produces `AuthResult`，一个不可变 dataclass，字段为 `access_token: str`、`refresh_token: str`、`token_type: str`、`expires_in: int`、`user: User`。
 - Produces `authenticate_user(session, request, device_info) -> AuthResult`。
+- Produces `refresh_authentication(session, refresh_token) -> AuthResult`。
 - Service 负责 `flush/commit`，不返回 HTTP response；预期失败抛 `BusinessError`。
 
 - [ ] **Step 1: Write failing service tests**
