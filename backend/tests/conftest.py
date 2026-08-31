@@ -3,8 +3,10 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from backend.main import app
+from backend.app.infra.database import get_db_session
+from backend.app.models import RefreshToken, User
 from backend.app.models.base import Base
+from backend.main import app
 
 
 @pytest_asyncio.fixture
@@ -22,9 +24,18 @@ async def async_session_factory() -> async_sessionmaker[AsyncSession]:
 
 
 @pytest_asyncio.fixture
-async def client() -> AsyncClient:
+async def client(async_session_factory) -> AsyncClient:
+    async def override_get_db_session():
+        async with async_session_factory() as session:
+            yield session
+
+    app.dependency_overrides[get_db_session] = override_get_db_session
     async with AsyncClient(
         transport=ASGITransport(app=app, raise_app_exceptions=False),
         base_url="http://testserver",
     ) as test_client:
         yield test_client
+    app.dependency_overrides.clear()
+
+
+__all__ = ["Base", "RefreshToken", "User"]

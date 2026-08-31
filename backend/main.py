@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
 from backend.app.core.config import get_settings
 from backend.app.core.response import ResponseEnvelope, success_response
 from backend.app.middlewares import RequestLoggingMiddleware, register_cors, register_exception_handlers
+from backend.app.views import auth_router
 
 
 settings = get_settings()
@@ -23,6 +24,7 @@ app = FastAPI(title=settings.app_name, lifespan=lifespan)
 register_exception_handlers(app)
 register_cors(app, settings)
 app.add_middleware(RequestLoggingMiddleware)
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
 
 
 @app.get("/", response_model=ResponseEnvelope[dict[str, str]])
