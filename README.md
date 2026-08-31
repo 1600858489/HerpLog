@@ -940,19 +940,32 @@ Care Plan
 当前仓库已包含最小可运行的前后端骨架：
 
 * `backend`：FastAPI 后端，提供 `/` 和 `/health` 接口。
-* `frontend`：React + Vite 前端，会请求后端 `/health` 并展示连接状态。
+* `frontend`：React + Vite 前端，目前仍使用 Mock 数据，尚未接入后端 API。该接入将在后端业务 API 完成后进行。
 
 ## 后端
 
-```powershell
-.\.venv\Scripts\Activate.ps1
-uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```bash
+uv sync
+uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+当前后端使用 SQLite 开发数据库，并通过 SQLAlchemy `create_all()` 创建已注册模型表。核心基础设施测试：
+
+```bash
+uv run pytest -q
+```
+
+健康检查返回统一 envelope：
+
+```json
+{"code": 0, "message": "success", "data": {"status": "ok"}}
 ```
 
 访问：
 
 ```text
 http://127.0.0.1:8000
+http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
 ```
 

@@ -132,11 +132,13 @@ from backend.main import app
 @pytest_asyncio.fixture
 async def client() -> AsyncClient:
     async with AsyncClient(
-        transport=ASGITransport(app=app),
+        transport=ASGITransport(app=app, raise_app_exceptions=False),
         base_url="http://testserver",
     ) as test_client:
         yield test_client
 ```
+
+`raise_app_exceptions=False` 是必要的：它让测试客户端接收全局异常 handler 生成的 500 envelope，而不是把未预期异常重新抛回测试进程。
 
 - [ ] **Step 5: Run test to verify it passes**
 
@@ -298,7 +300,19 @@ async def create_all_tables() -> None: ...
 
 - [ ] **Step 5: Add temporary database fixture**
 
-`conftest.py` 提供 `async_session_factory` fixture，使用 `sqlite+aiosqlite:///:memory:` 或临时文件，并在 fixture 建表/清理。测试不得使用全局生产 engine。
+`conftest.py` 提供 `async_session_factory` fixture，使用 `sqlite+aiosqlite:///:memory:`、`StaticPool` 和单一异步连接，确保建表与测试 Session 共享同一内存数据库；fixture 结束时清理连接。测试不得使用全局生产 engine。具体配置必须包含：
+
+```python
+from sqlalchemy.pool import StaticPool
+
+create_async_engine(
+    "sqlite+aiosqlite://",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+```
+
+使用 `sqlite+aiosqlite://` 配合 `StaticPool`，而不是每次创建独立连接的 `:memory:` URL。
 
 - [ ] **Step 6: Run database tests**
 
