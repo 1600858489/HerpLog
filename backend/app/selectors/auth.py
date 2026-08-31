@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from backend.app.models import RefreshToken, User
 
@@ -26,12 +27,14 @@ async def get_user_by_uuid(session: AsyncSession, user_uuid: UUID) -> User | Non
 
 
 async def get_refresh_token_by_hash(session: AsyncSession, token_hash: str) -> RefreshToken | None:
-    """Find one refresh-token credential by its unique hash."""
+    """Find one refresh-token credential and explicitly load its user."""
     result = await session.execute(
-        select(RefreshToken).where(
+        select(RefreshToken)
+        .where(
             RefreshToken.token_hash == token_hash,
             RefreshToken.deleted_at.is_(None),
         )
+        .options(selectinload(RefreshToken.user))
     )
     return result.scalar_one_or_none()
 

@@ -6,9 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.config import get_settings
 from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security import create_access_token, generate_refresh_token, hash_password, hash_refresh_token, verify_password
+from backend.app.core.security import (
+    create_access_token,
+    generate_refresh_token,
+    hash_password,
+    hash_refresh_token,
+    verify_password,
+)
 from backend.app.models import RefreshToken, User
-from backend.app.selectors import get_user_by_identifier
+from backend.app.selectors import get_refresh_token_by_hash, get_user_by_identifier
 from backend.app.utils.datetime import utc_now
 
 if TYPE_CHECKING:
@@ -26,10 +32,22 @@ class AuthResult:
     user: User
 
 
+def _build_auth_result(user: User, refresh_token: str) -> AuthResult:
+    """Build access-token response data for an authenticated user."""
+    settings = get_settings()
+    return AuthResult(
+        access_token=create_access_token(str(user.uuid)),
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=settings.access_token_expire_minutes * 60,
+        user=user,
+    )
+
+
 async def register_user(session: AsyncSession, request: "RegisterRequest") -> User:
     """Register an account after checking normalized identity conflicts."""
     for identifier in (request.username, request.phone, request.email):
-        if identifier is not None and await get_user_by_identifier(session, identifier):
+        if identifier is not None and await get_user_by_identifier(session, str(identifier)):
             raise BusinessError(ErrorCode.USER_CONFLICT)
 
     user = User(
@@ -39,7 +57,8 @@ async def register_user(session: AsyncSession, request: "RegisterRequest") -> Us
         password_hash=hash_password(request.password),
     )
     session.add(user)
-    await session.flush()
+    await session.commit()
+    await session.refresh(user)
     return user
 
 
@@ -61,14 +80,48 @@ async def authenticate_user(
             device_info=device_info,
         )
     )
-    await session.flush()
-    return AuthResult(
-        access_token=create_access_token(str(user.uuid)),
-        refresh_token=refresh_token,
-        token_type="bearer",
-        expires_in=settings.access_token_expire_minutes * 60,
-        user=user,
+    await session.commit()
+    return _build_auth_result(user, refresh_token)
+
+
+async def refresh_authentication(session: AsyncSession, refresh_token: str) -> AuthResult:
+    """Rotate a valid refresh token and revoke the presented credential."""
+    token_record = await get_refresh_token_by_hash(session, hash_refresh_token(refresh_token))
+    if (
+        token_record is None
+        or token_record.revoked_at is not None
+        or token_record.expires_at <= utc_now()
+        or token_record.user.deleted_at is not None
+    ):
+        raise BusinessError(ErrorCode.REFRESH_TOKEN_INVALID)
+
+    token_record.revoked_at = utc_now()
+    new_refresh_token = generate_refresh_token()
+    session.add(
+        RefreshToken(
+            user_id=token_record.user_id,
+            token_hash=hash_refresh_token(new_refresh_token),
+            expires_at=utc_now() + timedelta(days=get_settings().refresh_token_expire_days),
+            device_info=token_record.device_info,
+        )
     )
+    await session.commit()
+    return _build_auth_result(token_record.user, new_refresh_token)
 
 
-__all__ = ["AuthResult", "register_user", "authenticate_user"]
+async def logout_user(session: AsyncSession, refresh_token: str) -> None:
+    """Revoke one active refresh-token session."""
+    token_record = await get_refresh_token_by_hash(session, hash_refresh_token(refresh_token))
+    if token_record is None or token_record.revoked_at is not None:
+        raise BusinessError(ErrorCode.REFRESH_TOKEN_INVALID)
+    token_record.revoked_at = utc_now()
+    await session.commit()
+
+
+__all__ = [
+    "AuthResult",
+    "authenticate_user",
+    "logout_user",
+    "refresh_authentication",
+    "register_user",
+]
