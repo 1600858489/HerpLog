@@ -4,7 +4,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from backend.app.models import RefreshToken, User
+from ..models import RefreshToken, User
 
 
 async def get_user_by_identifier(session: AsyncSession, identifier: str) -> User | None:

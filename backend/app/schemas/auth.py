@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-from backend.app.schemas.base import BaseRequestSchema
+from .base import BaseRequestSchema
 
 
 class RegisterRequest(BaseRequestSchema):

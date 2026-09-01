@@ -2,8 +2,8 @@ from datetime import timedelta
 
 from sqlalchemy import select
 
-from backend.app.models import RefreshToken, User
-from backend.app.utils.datetime import utc_now
+from app.models import RefreshToken, User
+from app.utils.datetime import utc_now
 
 
 async def test_auth_models_persist_public_uuid_and_relationship(async_session_factory) -> None:

@@ -4,11 +4,11 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security.jwt import decode_access_token
-from backend.app.infra.database import get_db_session
-from backend.app.models import User
-from backend.app.selectors import get_user_by_uuid
+from ..errors import BusinessError, ErrorCode
+from .jwt import decode_access_token
+from ...infra.database import get_db_session
+from ...models import User
+from ...selectors import get_user_by_uuid
 
 
 bearer_scheme = HTTPBearer(auto_error=False)

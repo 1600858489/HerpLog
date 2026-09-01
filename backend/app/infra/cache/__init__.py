@@ -1,3 +1,3 @@
-from backend.app.infra.cache.base import CacheClient
+from .base import CacheClient
 
 __all__ = ["CacheClient"]

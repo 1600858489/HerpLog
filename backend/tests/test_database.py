@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
+from app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
 
 
 class ExampleRecord(IDMixin, TimestampMixin, SoftDeleteMixin, Base):

@@ -4,8 +4,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from backend.app.core.errors import BusinessError, ErrorCode, get_error_metadata
-from backend.app.core.response import error_response
+from ..core.errors import BusinessError, ErrorCode, get_error_metadata
+from ..core.response import error_response
 
 logger = logging.getLogger(__name__)
 

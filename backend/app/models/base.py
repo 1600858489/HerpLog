@@ -1,13 +1,12 @@
 from datetime import datetime, timezone
-from typing import Annotated
 from uuid import UUID
 
 from sqlalchemy import DateTime, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.types import TypeDecorator
 
-from backend.app.utils.datetime import utc_now
-from backend.app.utils.uuid import generate_uuid
+from ..utils.datetime import utc_now
+from ..utils.uuid import generate_uuid
 
 
 class UUIDString(TypeDecorator[UUID]):

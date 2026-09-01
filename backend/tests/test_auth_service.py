@@ -3,17 +3,17 @@ from datetime import timedelta
 import pytest
 from sqlalchemy import select
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security.token import hash_refresh_token
-from backend.app.models import RefreshToken
-from backend.app.schemas.auth import LoginRequest, RegisterRequest
-from backend.app.services.auth import (
+from app.core.errors import BusinessError, ErrorCode
+from app.core.security.token import hash_refresh_token
+from app.models import RefreshToken
+from app.schemas.auth import LoginRequest, RegisterRequest
+from app.services.auth import (
     authenticate_user,
     logout_user,
     refresh_authentication,
     register_user,
 )
-from backend.app.utils.datetime import utc_now
+from app.utils.datetime import utc_now
 
 
 async def test_register_hashes_password_and_derives_username(async_session_factory) -> None:

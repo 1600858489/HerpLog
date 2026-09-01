@@ -1,4 +1,4 @@
-from backend.app.core.config import get_settings
+from ...core.config import get_settings
 
 
 def get_celery_config() -> dict[str, str]:

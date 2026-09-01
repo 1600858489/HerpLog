@@ -49,7 +49,7 @@ async def test_login_refresh_logout_and_me_flow(client) -> None:
 
 from datetime import timedelta
 
-from backend.app.core.security.jwt import create_access_token
+from app.core.security.jwt import create_access_token
 
 
 async def test_refresh_token_cannot_be_reused_after_rotation(client) -> None:

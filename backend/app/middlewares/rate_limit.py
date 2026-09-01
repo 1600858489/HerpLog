@@ -1,6 +1,6 @@
 from starlette.requests import Request
 
-from backend.app.infra.cache.base import CacheClient
+from ..infra.cache.base import CacheClient
 
 
 class RateLimiter:

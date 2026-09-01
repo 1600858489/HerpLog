@@ -2,7 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from backend.app.infra.database import create_all_tables
+from app.core.config import get_settings
+from app.core.response import ResponseEnvelope, success_response
+from app.infra.database import create_all_tables
+from app.middlewares import RequestLoggingMiddleware, register_cors, register_exception_handlers
+from app.views import auth_router
 
 
 @asynccontextmanager
@@ -10,12 +14,6 @@ async def lifespan(app: FastAPI):
     """Initialize development database tables during application startup."""
     await create_all_tables()
     yield
-
-
-from backend.app.core.config import get_settings
-from backend.app.core.response import ResponseEnvelope, success_response
-from backend.app.middlewares import RequestLoggingMiddleware, register_cors, register_exception_handlers
-from backend.app.views import auth_router
 
 
 settings = get_settings()

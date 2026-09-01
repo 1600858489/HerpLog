@@ -3,10 +3,10 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from backend.app.infra.database import get_db_session
-from backend.app.models import RefreshToken, User
-from backend.app.models.base import Base
-from backend.main import app
+from app.infra.database import get_db_session
+from app.models import RefreshToken, User
+from app.models.base import Base
+from main import app
 
 
 @pytest_asyncio.fixture

@@ -1,7 +1,7 @@
 import inspect
 
-from backend.app.infra.cache.base import CacheClient
-from backend.app.infra.storage.base import FileStorage
+from app.infra.cache.base import CacheClient
+from app.infra.storage.base import FileStorage
 
 
 def test_cache_contract_is_async_abstract_interface() -> None:

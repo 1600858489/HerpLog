@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from backend.app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
+from .base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
 
 if TYPE_CHECKING:
-    from backend.app.models.refresh_token import RefreshToken
+    from .refresh_token import RefreshToken
 
 
 class User(IDMixin, TimestampMixin, SoftDeleteMixin, Base):

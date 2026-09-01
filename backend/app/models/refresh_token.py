@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin, UTCDateTime
+from .base import Base, IDMixin, SoftDeleteMixin, TimestampMixin, UTCDateTime
 
 if TYPE_CHECKING:
-    from backend.app.models.user import User
+    from .user import User
 
 
 class RefreshToken(IDMixin, TimestampMixin, SoftDeleteMixin, Base):

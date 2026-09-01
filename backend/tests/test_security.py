@@ -1,6 +1,6 @@
-from backend.app.core.security.jwt import create_access_token, decode_access_token
-from backend.app.core.security.password import hash_password, verify_password
-from backend.app.core.security.token import generate_refresh_token, hash_refresh_token
+from app.core.security.jwt import create_access_token, decode_access_token
+from app.core.security.password import hash_password, verify_password
+from app.core.security.token import generate_refresh_token, hash_refresh_token
 
 
 def test_password_hash_is_verifiable_and_not_plaintext() -> None:

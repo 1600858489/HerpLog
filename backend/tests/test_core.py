@@ -4,13 +4,13 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from backend.app.core.config import Settings
-from backend.app.core.errors import ErrorCode, get_error_metadata
-from backend.app.core.pagination import PaginationParams, build_pagination
-from backend.app.core.response import success_response
-from backend.app.utils.datetime import utc_now
-from backend.app.utils.string import normalize_optional_text
-from backend.app.utils.uuid import generate_uuid
+from app.core.config import Settings
+from app.core.errors import ErrorCode, get_error_metadata
+from app.core.pagination import PaginationParams, build_pagination
+from app.core.response import success_response
+from app.utils.datetime import utc_now
+from app.utils.string import normalize_optional_text
+from app.utils.uuid import generate_uuid
 
 
 def test_production_rejects_development_jwt_secret() -> None:
@@ -72,7 +72,7 @@ def test_pagination_builds_total_pages() -> None:
 
 
 def test_request_schema_forbids_internal_identifiers() -> None:
-    from backend.app.schemas.base import BaseRequestSchema
+    from app.schemas.base import BaseRequestSchema
 
     class ExampleRequest(BaseRequestSchema):
         name: str

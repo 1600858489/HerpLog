@@ -4,21 +4,21 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.config import get_settings
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security import (
+from ..core.config import get_settings
+from ..core.errors import BusinessError, ErrorCode
+from ..core.security import (
     create_access_token,
     generate_refresh_token,
     hash_password,
     hash_refresh_token,
     verify_password,
 )
-from backend.app.models import RefreshToken, User
-from backend.app.selectors import get_refresh_token_by_hash, get_user_by_identifier
-from backend.app.utils.datetime import utc_now
+from ..models import RefreshToken, User
+from ..selectors import get_refresh_token_by_hash, get_user_by_identifier
+from ..utils.datetime import utc_now
 
 if TYPE_CHECKING:
-    from backend.app.schemas.auth import LoginRequest, RegisterRequest
+    from ..schemas.auth import LoginRequest, RegisterRequest
 
 
 @dataclass(frozen=True)

@@ -3,7 +3,7 @@ from typing import Generic, Sequence, TypeVar
 
 from pydantic import BaseModel, Field
 
-from backend.app.core.constants import DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
+from .constants import DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 
 
 ItemT = TypeVar("ItemT")

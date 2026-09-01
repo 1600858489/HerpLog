@@ -3,8 +3,8 @@ from typing import Any
 
 import jwt
 
-from backend.app.core.config import get_settings
-from backend.app.core.errors import BusinessError, ErrorCode
+from ..config import get_settings
+from ..errors import BusinessError, ErrorCode
 
 
 def create_access_token(subject: str, expires_delta: timedelta | None = None) -> str:

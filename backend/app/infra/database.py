@@ -2,8 +2,8 @@ from collections.abc import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
-from backend.app.core.config import get_settings
-from backend.app.models.base import Base
+from ..core.config import get_settings
+from ..models.base import Base
 
 
 settings = get_settings()

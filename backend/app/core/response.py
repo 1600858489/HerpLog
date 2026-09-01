@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-from backend.app.core.errors import ErrorCode, get_error_metadata
+from .errors import ErrorCode, get_error_metadata
 
 
 DataT = TypeVar("DataT")

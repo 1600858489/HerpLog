@@ -2,11 +2,11 @@ from uuid import UUID
 
 from fastapi.security import HTTPAuthorizationCredentials
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security.dependencies import get_current_user
-from backend.app.models import User
-from backend.app.schemas.auth import LoginRequest, RegisterRequest
-from backend.app.services.auth import authenticate_user, register_user
+from app.core.errors import BusinessError, ErrorCode
+from app.core.security.dependencies import get_current_user
+from app.models import User
+from app.schemas.auth import LoginRequest, RegisterRequest
+from app.services.auth import authenticate_user, register_user
 
 
 async def test_current_user_dependency_returns_user(async_session_factory) -> None:

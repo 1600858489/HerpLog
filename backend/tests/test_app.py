@@ -2,8 +2,8 @@ from collections.abc import Callable, Awaitable
 
 from fastapi import APIRouter
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.main import app, lifespan
+from app.core.errors import BusinessError, ErrorCode
+from main import app, lifespan
 
 
 async def business_error_endpoint() -> None:
@@ -31,7 +31,7 @@ async def test_lifespan_initializes_database(monkeypatch) -> None:
         nonlocal initialized
         initialized = True
 
-    monkeypatch.setattr("backend.main.create_all_tables", fake_create_all_tables)
+    monkeypatch.setattr("main.create_all_tables", fake_create_all_tables)
     async with lifespan(app):
         pass
     assert initialized
