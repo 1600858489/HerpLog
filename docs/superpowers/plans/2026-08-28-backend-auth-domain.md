@@ -160,7 +160,7 @@
 - `User` 字段：`username`、`phone`、`email`、`password_hash`、`wechat_openid`。
 - `RefreshToken` 字段：`user_id`、`token_hash`、`expires_at`、`revoked_at`、`device_info`。
 - 两个模型均继承公共 Mixin；关系使用 `lazy="raise"`。
-- 后续数据库 fixture 导入 `backend.app.models` 后可由 `Base.metadata.create_all` 建表。
+- 后续数据库 fixture 从 `app` 包导入模型 后可由 `Base.metadata.create_all` 建表。
 
 - [ ] **Step 1: Write the failing test**
 
@@ -169,8 +169,8 @@ from datetime import timedelta
 
 from sqlalchemy import select
 
-from backend.app.models import RefreshToken, User
-from backend.app.utils.datetime import utc_now
+from app.models import RefreshToken, User
+from app.utils.datetime import utc_now
 
 
 async def test_auth_models_persist_public_uuid_and_relationship(async_session_factory) -> None:
@@ -195,7 +195,7 @@ async def test_auth_models_persist_public_uuid_and_relationship(async_session_fa
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `uv run pytest backend/tests/test_auth_models.py::test_auth_models_persist_public_uuid_and_relationship -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_models.py::test_auth_models_persist_public_uuid_and_relationship -q`
 
 Expected: FAIL because authentication models are not defined or not registered。
 
@@ -205,7 +205,7 @@ Use typed SQLAlchemy mappings. Add database-level unique constraints for usernam
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `uv run pytest backend/tests/test_auth_models.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_models.py -q`
 
 Expected: PASS。
 
@@ -234,7 +234,7 @@ git commit -m "feat: 增加用户与刷新令牌模型"
 import pytest
 from pydantic import ValidationError
 
-from backend.app.schemas.auth import LoginRequest, RegisterRequest
+from app.schemas.auth import LoginRequest, RegisterRequest
 
 
 def test_register_rejects_request_without_any_identity() -> None:
@@ -263,7 +263,7 @@ def test_login_requires_identifier_and_password() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_auth_schemas.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_schemas.py -q`
 
 Expected: FAIL because auth schemas are missing。
 
@@ -273,7 +273,7 @@ Use Pydantic field validators for whitespace and email normalization. Register v
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_auth_schemas.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_schemas.py -q`
 
 Expected: PASS。
 
@@ -309,9 +309,9 @@ git commit -m "feat: 定义认证请求与响应序列化器"
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.schemas.auth import LoginRequest, RegisterRequest
-from backend.app.services.auth import authenticate_user, register_user
+from app.core.errors import BusinessError, ErrorCode
+from app.schemas.auth import LoginRequest, RegisterRequest
+from app.services.auth import authenticate_user, register_user
 
 
 async def test_register_hashes_password_and_derives_username(async_session_factory) -> None:
@@ -345,7 +345,7 @@ async def test_login_rejects_wrong_password_without_leaking_details(async_sessio
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_auth_service.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_service.py -q`
 
 Expected: FAIL because auth selector/service modules do not exist。
 
@@ -363,7 +363,7 @@ Find user by identifier, verify bcrypt hash, create Access Token with the user U
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_auth_service.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_service.py -q`
 
 Expected: PASS。
 
@@ -392,9 +392,9 @@ git commit -m "feat: 实现用户注册与登录服务"
 
 ```python
 import pytest
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.security.dependencies import get_current_user
-from backend.app.services.auth import authenticate_user, refresh_authentication, logout_user
+from app.core.errors import BusinessError, ErrorCode
+from app.core.security.dependencies import get_current_user
+from app.services.auth import authenticate_user, refresh_authentication, logout_user
 
 
 async def test_refresh_rotates_token_and_revokes_old_one(async_session_factory) -> None:
@@ -419,7 +419,7 @@ The implementation test file must define `login_request` with `LoginRequest(iden
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_auth_service.py backend/tests/test_auth_dependencies.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_service.py backend/tests/test_auth_dependencies.py -q`
 
 Expected: FAIL because refresh/logout/dependency interfaces are missing。
 
@@ -437,7 +437,7 @@ Use FastAPI `HTTPBearer(auto_error=False)`. Missing credentials raise `UNAUTHORI
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_auth_service.py backend/tests/test_auth_dependencies.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_service.py backend/tests/test_auth_dependencies.py -q`
 
 Expected: PASS。
 
@@ -457,7 +457,7 @@ git commit -m "feat: 增加刷新令牌轮换与用户鉴权依赖"
 - Create: `backend/tests/test_auth_api.py`
 
 **Interfaces:**
-- Produces `auth_router`，由 `backend.main` 挂载为 `/api/v1/auth`。
+- Produces `auth_router`，由 `main`（从 `backend` 目录加载） 挂载为 `/api/v1/auth`。
 - View endpoint 只接收 Schema、注入 AsyncSession/当前用户、调用 Service、序列化 ORM 返回 envelope。
 - 端点：`register`、`login`、`refresh`、`logout`、`me`。
 
@@ -532,7 +532,7 @@ async def test_auth_api_rejects_internal_id_and_hides_authentication_details(cli
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_auth_api.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_api.py -q`
 
 Expected: FAIL because auth router is not mounted。
 
@@ -542,7 +542,7 @@ Use `Depends(get_db_session)`, `Depends(get_current_user)`, and request Schema t
 
 - [ ] **Step 4: Mount versioned router**
 
-Add `app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])` in `backend/main.py`; keep existing health endpoints unchanged. Import the router through `backend.app.views` package export, not an internal module path from other business domains.
+Add `app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])` in `backend/main.py`; keep existing health endpoints unchanged. Import the router through the `app.views` package export, not an internal module path from other business domains.
 
 - [ ] **Step 5: Configure test database override**
 
@@ -550,9 +550,9 @@ Update `conftest.py` with a per-test SQLite `StaticPool` engine, import all mode
 
 - [ ] **Step 6: Run API tests**
 
-Run: `uv run pytest backend/tests/test_auth_api.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_auth_api.py -q`
 
-Expected: PASS；随后运行 `uv run pytest -q`，既有核心测试与认证测试全部通过。
+Expected: PASS；随后运行 `cd backend && uv run --project .. pytest -q`，既有核心测试与认证测试全部通过。
 
 - [ ] **Step 7: Commit**
 
@@ -626,9 +626,9 @@ async def test_expired_access_token_returns_safe_401(client) -> None:
 Run:
 
 ```bash
-uv run pytest -q
+cd backend && uv run --project .. pytest -q
 uv run python -m compileall backend
-uv run python -c "from backend.main import app; print([route.path for route in app.routes if '/api/v1/auth' in route.path])"
+uv run python -c "from main import app; print([route.path for route in app.routes if '/api/v1/auth' in route.path])"
 git diff --check
 ```
 
@@ -639,7 +639,7 @@ Expected: 所有测试通过，编译和导入成功，输出五个认证路由�
 使用临时 SQLite 文件和临时端口启动：
 
 ```bash
-DATABASE_URL=sqlite+aiosqlite:////tmp/herplog-auth-smoke.db uv run uvicorn backend.main:app --host 127.0.0.1 --port 18002
+DATABASE_URL=sqlite+aiosqlite:////tmp/herplog-auth-smoke.db uv run cd backend && uv run --project .. uvicorn main:app --host 127.0.0.1 --port 18002
 ```
 
 请求 `/health` 和注册/登录流程，确认真实 ASGI 服务可用；结束后不提交临时数据库文件。

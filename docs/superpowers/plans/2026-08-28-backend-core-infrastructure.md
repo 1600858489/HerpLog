@@ -84,7 +84,7 @@ def test_test_runner_is_configured() -> None:
 
 - [ ] **Step 2: Run test to verify it fails for the expected environment reason**
 
-Run: `uv run pytest backend/tests/test_core.py::test_test_runner_is_configured -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py::test_test_runner_is_configured -q`
 
 Expected before依赖安装: 命令可能因 `pytest` 未安装失败；不得通过修改测试绕过依赖问题。
 
@@ -112,7 +112,7 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-pythonpath = ["."]
+pythonpath = ["backend"]
 testpaths = ["backend/tests"]
 ```
 
@@ -126,7 +126,7 @@ testpaths = ["backend/tests"]
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
-from backend.main import app
+from main import app
 
 
 @pytest_asyncio.fixture
@@ -142,7 +142,7 @@ async def client() -> AsyncClient:
 
 - [ ] **Step 5: Run test to verify it passes**
 
-Run: `uv run pytest backend/tests/test_core.py::test_test_runner_is_configured -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py::test_test_runner_is_configured -q`
 
 Expected: `1 passed`。
 
@@ -177,9 +177,9 @@ git commit -m "build: configure async backend test dependencies"
 from datetime import timezone
 from uuid import UUID
 
-from backend.app.utils.datetime import utc_now
-from backend.app.utils.string import normalize_optional_text
-from backend.app.utils.uuid import generate_uuid
+from app.utils.datetime import utc_now
+from app.utils.string import normalize_optional_text
+from app.utils.uuid import generate_uuid
 
 
 def test_generate_uuid_returns_uuid() -> None:
@@ -198,7 +198,7 @@ def test_normalize_optional_text_trims_and_converts_blank_to_none() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: FAIL with import errors because the utility modules do not exist。
 
@@ -214,7 +214,7 @@ Expected: FAIL with import errors because the utility modules do not exist。
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: `4 passed` 或更多（含原始 runner 测试）。
 
@@ -253,7 +253,7 @@ from uuid import UUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
+from app.models.base import Base, IDMixin, SoftDeleteMixin, TimestampMixin
 
 
 class ExampleRecord(IDMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -277,7 +277,7 @@ async def test_create_all_and_public_mixins(async_session_factory) -> None:
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `uv run pytest backend/tests/test_database.py::test_create_all_and_public_mixins -q`
+Run: `cd backend && uv run --project .. pytest tests/test_database.py::test_create_all_and_public_mixins -q`
 
 Expected: FAIL because the Base and async test database fixture are not implemented。
 
@@ -316,7 +316,7 @@ create_async_engine(
 
 - [ ] **Step 6: Run database tests**
 
-Run: `uv run pytest backend/tests/test_database.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_database.py -q`
 
 Expected: PASS，且可确认数据库内部 `id` 与 API 对外 `uuid` 的职责不同。
 
@@ -351,9 +351,9 @@ git commit -m "feat: add async database base and shared mixins"
 import pytest
 from pydantic import ValidationError
 
-from backend.app.core.errors import BusinessError, ErrorCode, get_error_metadata
-from backend.app.core.pagination import PaginationParams, build_pagination
-from backend.app.core.response import success_response
+from app.core.errors import BusinessError, ErrorCode, get_error_metadata
+from app.core.pagination import PaginationParams, build_pagination
+from app.core.response import success_response
 
 
 def test_business_error_metadata_contains_http_status_and_message() -> None:
@@ -385,7 +385,7 @@ def test_pagination_builds_total_pages() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: FAIL because response, error and pagination modules do not exist。
 
@@ -412,7 +412,7 @@ class ErrorMetadata:
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: PASS。
 
@@ -446,9 +446,9 @@ git commit -m "feat: add response error and pagination contracts"
 ```python
 from datetime import timedelta
 
-from backend.app.core.security.jwt import create_access_token, decode_access_token
-from backend.app.core.security.password import hash_password, verify_password
-from backend.app.core.security.token import generate_refresh_token, hash_refresh_token
+from app.core.security.jwt import create_access_token, decode_access_token
+from app.core.security.password import hash_password, verify_password
+from app.core.security.token import generate_refresh_token, hash_refresh_token
 
 
 def test_password_hash_is_verifiable_and_not_plaintext() -> None:
@@ -474,7 +474,7 @@ def test_refresh_token_is_random_and_only_hash_is_persisted() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: FAIL with missing security module imports。
 
@@ -492,7 +492,7 @@ Expected: FAIL with missing security module imports。
 
 - [ ] **Step 6: Run security tests**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: PASS。
 
@@ -525,8 +525,8 @@ git commit -m "feat: add password and token security primitives"
 ```python
 import inspect
 
-from backend.app.infra.cache.base import CacheClient
-from backend.app.infra.storage.base import FileStorage
+from app.infra.cache.base import CacheClient
+from app.infra.storage.base import FileStorage
 
 
 def test_cache_contract_is_async_abstract_interface() -> None:
@@ -543,7 +543,7 @@ def test_storage_contract_is_async_abstract_interface() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: FAIL because infra contracts do not exist。
 
@@ -561,7 +561,7 @@ Expected: FAIL because infra contracts do not exist。
 
 - [ ] **Step 6: Run tests to verify they pass**
 
-Run: `uv run pytest backend/tests/test_core.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_core.py -q`
 
 Expected: PASS。
 
@@ -598,8 +598,8 @@ git commit -m "feat: define external infrastructure contracts"
 ```python
 from fastapi import APIRouter
 
-from backend.app.core.errors import BusinessError, ErrorCode
-from backend.app.core.response import ResponseEnvelope
+from app.core.errors import BusinessError, ErrorCode
+from app.core.response import ResponseEnvelope
 
 
 async def test_health_uses_response_envelope(client) -> None:
@@ -644,7 +644,7 @@ async def test_unexpected_error_does_not_leak_python_text(client) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run pytest backend/tests/test_app.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_app.py -q`
 
 Expected: FAIL because health still returns the旧格式，且异常 handler 尚未注册。
 
@@ -664,7 +664,7 @@ CORS 的 allowed origins 从 Settings 读取；请求日志 middleware 生成或
 
 - [ ] **Step 6: Run API tests**
 
-Run: `uv run pytest backend/tests/test_app.py -q`
+Run: `cd backend && uv run --project .. pytest tests/test_app.py -q`
 
 Expected: PASS。再运行 `uv run pytest`，Expected: 全部 backend tests PASS。
 
@@ -687,19 +687,19 @@ git commit -m "feat: add safe API error handling and middleware foundation"
 - Test: `backend/tests/test_app.py`
 
 **Interfaces:**
-- Produces一个可通过 `uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000` 启动的核心后端骨架。
+- Produces一个可通过 `uv run cd backend && uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000` 启动的核心后端骨架。
 - `GET /health`、核心模块导入、SQLite 建表、统一异常响应和安全工具均有自动化验证。
 - 后续业务计划可以直接依赖 `get_db_session`、`Base`/Mixins、`ResponseEnvelope`、`BusinessError`、`PaginationParams`、security API 和 infra 抽象，不需要重建基础设施。
 
 - [ ] **Step 1: Run the complete backend test suite**
 
-Run: `uv run pytest -q`
+Run: `cd backend && uv run --project .. pytest -q`
 
 Expected: 所有 backend tests PASS。
 
 - [ ] **Step 2: Run static/import checks**
 
-Run: `uv run python -c "from backend.main import app; print(app.title)"`
+Run: `uv run python -c "from main import app; print(app.title)"`
 
 Expected: 输出 `HerpLog API`，不出现循环导入错误。
 
@@ -715,7 +715,7 @@ Expected: 命令成功完成，不产生语法错误。
 
 - [ ] **Step 4: Build/run smoke check**
 
-Run: `uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000`，用独立 HTTP 客户端请求 `/health` 后正常停止进程。不得把真实密钥、数据库文件或上传文件提交到 Git。
+Run: `uv run cd backend && uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000`，用独立 HTTP 客户端请求 `/health` 后正常停止进程。不得把真实密钥、数据库文件或上传文件提交到 Git。
 
 Expected: `/health` 返回 HTTP 200 的统一 envelope。
 
@@ -728,7 +728,7 @@ Expected: `/health` 返回 HTTP 200 的统一 envelope。
 Run:
 
 ```bash
-uv run pytest -q
+cd backend && uv run --project .. pytest -q
 uv run python -m compileall backend
  git diff --check
 ```

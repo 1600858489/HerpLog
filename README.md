@@ -946,7 +946,8 @@ Care Plan
 
 ```bash
 uv sync
-uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+cd backend
+uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 当前后端使用 SQLite 开发数据库，并通过 SQLAlchemy `create_all()` 创建已注册模型表。已实现版本化认证 API：
@@ -960,7 +961,8 @@ uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 认证请求使用 snake_case，拒绝 `id`/`uuid` 等未声明字段；微信登录、Redis 黑名单、PostgreSQL 迁移和前端 API 接入尚未实现。核心测试：
 
 ```bash
-uv run pytest -q
+cd backend
+uv run --project .. pytest -q
 ```
 
 健康检查返回统一 envelope：

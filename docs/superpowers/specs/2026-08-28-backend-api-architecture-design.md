@@ -88,6 +88,15 @@ backend/
 - 跨域调用只能引用目标包 `__init__.py` 导出的符号，禁止 `from services.pets.internal import xxx` 这种绕过 `__init__` 直接引用内部文件的写法
 - 禁止出现循环导入；当两个域出现双向依赖需求时，应在更上层（service 组合、专门的协调函数）解决，不通过延迟导入掩盖问题
 
+### 导入与启动规范
+
+- `backend/main.py` 是后端入口，使用 `app.*` 导入应用包；不得从仓库根目录直接以 `backend/main.py` 作为脚本运行
+- `backend/app/` 内部优先使用包内相对导入：同一子包使用 `.module`，跨 `app` 子包使用 `..` 或更多层级的相对导入
+- Python 标准库和第三方库使用绝对导入；测试从 `backend` 目录运行并使用 `app.*` 导入
+- 推荐启动方式：`cd backend && uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000 --reload`
+- 推荐测试方式：`cd backend && uv run --project .. pytest -q`
+- 新增后端代码必须遵循该导入上下文，禁止混用 `backend.app.*` 与 `app.*` 导致同一模块被加载为不同对象
+
 ## 数据库表清单
 
 ### 公共 Mixin（所有业务表继承）
