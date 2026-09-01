@@ -4,7 +4,23 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 from app.infra.database import get_db_session
-from app.models import RefreshToken, User
+from app.models import (
+    IdentificationTag,
+    ManagementUnit,
+    ManagementUnitType,
+    PersonalGene,
+    PersonalSpecies,
+    Pet,
+    PetGene,
+    PetIdentificationTag,
+    PetLifeStage,
+    PetManagementAssignment,
+    PetOrigin,
+    RefreshToken,
+    User,
+)
+
+import app.models.pet_domain
 from app.models.base import Base
 from main import app
 
