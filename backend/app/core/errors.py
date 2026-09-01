@@ -23,12 +23,34 @@ class ErrorCode(IntEnum):
     PET_VALIDATION_FAILED = 3111
     PET_CONFLICT = 3121
     PET_FORBIDDEN = 3131
+    PET_INVALID_STATE = 3141
     CARE_RULE_NOT_FOUND = 3201
     CARE_RULE_VALIDATION_FAILED = 3211
     PET_STATE_NOT_FOUND = 3301
     PET_STATE_VALIDATION_FAILED = 3311
     SPECIES_NOT_FOUND = 3401
     SPECIES_VALIDATION_FAILED = 3411
+    SPECIES_CONFLICT = 3421
+    GENE_NOT_FOUND = 3501
+    GENE_VALIDATION_FAILED = 3511
+    GENE_CONFLICT = 3521
+    IDENTIFICATION_TAG_NOT_FOUND = 3601
+    IDENTIFICATION_TAG_VALIDATION_FAILED = 3611
+    IDENTIFICATION_TAG_CONFLICT = 3621
+    MANAGEMENT_UNIT_NOT_FOUND = 3701
+    MANAGEMENT_UNIT_VALIDATION_FAILED = 3711
+    MANAGEMENT_UNIT_CONFLICT = 3721
+    MANAGEMENT_UNIT_FORBIDDEN = 3731
+    MANAGEMENT_UNIT_INVALID_STATE = 3741
+    MANAGEMENT_UNIT_TYPE_NOT_FOUND = 3801
+    MANAGEMENT_UNIT_TYPE_VALIDATION_FAILED = 3811
+    MANAGEMENT_UNIT_TYPE_CONFLICT = 3821
+    MANAGEMENT_UNIT_TYPE_FORBIDDEN = 3831
+    ORIGIN_OR_ASSIGNMENT_NOT_FOUND = 3901
+    ORIGIN_OR_ASSIGNMENT_VALIDATION_FAILED = 3911
+    ORIGIN_OR_ASSIGNMENT_CONFLICT = 3921
+    ORIGIN_OR_ASSIGNMENT_FORBIDDEN = 3931
+    ORIGIN_OR_ASSIGNMENT_INVALID_STATE = 3941
 
     EVENT_NOT_FOUND = 4101
     EVENT_VALIDATION_FAILED = 4111
@@ -62,12 +84,34 @@ _ERROR_METADATA: Mapping[ErrorCode, ErrorMetadata] = MappingProxyType(
         ErrorCode.PET_VALIDATION_FAILED: ErrorMetadata(400, "宠物信息无效"),
         ErrorCode.PET_CONFLICT: ErrorMetadata(409, "宠物信息已存在"),
         ErrorCode.PET_FORBIDDEN: ErrorMetadata(403, "无权操作该宠物"),
+        ErrorCode.PET_INVALID_STATE: ErrorMetadata(400, "宠物状态无效"),
         ErrorCode.CARE_RULE_NOT_FOUND: ErrorMetadata(404, "护理规则不存在"),
         ErrorCode.CARE_RULE_VALIDATION_FAILED: ErrorMetadata(400, "护理规则无效"),
         ErrorCode.PET_STATE_NOT_FOUND: ErrorMetadata(404, "宠物状态不存在"),
         ErrorCode.PET_STATE_VALIDATION_FAILED: ErrorMetadata(400, "宠物状态无效"),
         ErrorCode.SPECIES_NOT_FOUND: ErrorMetadata(404, "物种不存在"),
         ErrorCode.SPECIES_VALIDATION_FAILED: ErrorMetadata(400, "物种信息无效"),
+        ErrorCode.SPECIES_CONFLICT: ErrorMetadata(409, "物种信息已存在"),
+        ErrorCode.GENE_NOT_FOUND: ErrorMetadata(404, "基因信息不存在"),
+        ErrorCode.GENE_VALIDATION_FAILED: ErrorMetadata(400, "基因信息无效"),
+        ErrorCode.GENE_CONFLICT: ErrorMetadata(409, "基因信息已存在"),
+        ErrorCode.IDENTIFICATION_TAG_NOT_FOUND: ErrorMetadata(404, "识别标签不存在"),
+        ErrorCode.IDENTIFICATION_TAG_VALIDATION_FAILED: ErrorMetadata(400, "识别标签无效"),
+        ErrorCode.IDENTIFICATION_TAG_CONFLICT: ErrorMetadata(409, "识别标签已存在"),
+        ErrorCode.MANAGEMENT_UNIT_NOT_FOUND: ErrorMetadata(404, "管理单元不存在"),
+        ErrorCode.MANAGEMENT_UNIT_VALIDATION_FAILED: ErrorMetadata(400, "管理单元信息无效"),
+        ErrorCode.MANAGEMENT_UNIT_CONFLICT: ErrorMetadata(409, "管理单元已存在"),
+        ErrorCode.MANAGEMENT_UNIT_FORBIDDEN: ErrorMetadata(403, "无权操作该管理单元"),
+        ErrorCode.MANAGEMENT_UNIT_INVALID_STATE: ErrorMetadata(400, "管理单元状态无效"),
+        ErrorCode.MANAGEMENT_UNIT_TYPE_NOT_FOUND: ErrorMetadata(404, "管理单元类型不存在"),
+        ErrorCode.MANAGEMENT_UNIT_TYPE_VALIDATION_FAILED: ErrorMetadata(400, "管理单元类型无效"),
+        ErrorCode.MANAGEMENT_UNIT_TYPE_CONFLICT: ErrorMetadata(409, "管理单元类型已存在"),
+        ErrorCode.MANAGEMENT_UNIT_TYPE_FORBIDDEN: ErrorMetadata(403, "无权操作系统管理单元类型"),
+        ErrorCode.ORIGIN_OR_ASSIGNMENT_NOT_FOUND: ErrorMetadata(404, "来源或分配记录不存在"),
+        ErrorCode.ORIGIN_OR_ASSIGNMENT_VALIDATION_FAILED: ErrorMetadata(400, "来源或分配信息无效"),
+        ErrorCode.ORIGIN_OR_ASSIGNMENT_CONFLICT: ErrorMetadata(409, "来源或分配记录冲突"),
+        ErrorCode.ORIGIN_OR_ASSIGNMENT_FORBIDDEN: ErrorMetadata(403, "无权操作该来源或分配记录"),
+        ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE: ErrorMetadata(400, "来源或分配状态无效"),
         ErrorCode.EVENT_NOT_FOUND: ErrorMetadata(404, "事件不存在"),
         ErrorCode.EVENT_VALIDATION_FAILED: ErrorMetadata(400, "事件信息无效"),
         ErrorCode.EVENT_FORBIDDEN: ErrorMetadata(403, "无权操作该事件"),
