@@ -12,9 +12,9 @@ from app.models import (
     PetManagementAssignment,
     User,
 )
-from app.schemas.pet import AssignmentMoveRequest, PetCreateRequest
-from app.services.lifecycle import move_pet
-from app.services.pet import create_pet, soft_delete_pet
+from app.schemas.pets import AssignmentMoveRequest, PetCreateRequest
+from app.services.pets.lifecycle import move_pet
+from app.services.pets.pet import create_pet, soft_delete_pet
 from app.utils.datetime import utc_now
 
 

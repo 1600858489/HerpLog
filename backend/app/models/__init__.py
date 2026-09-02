@@ -1,5 +1,5 @@
 from .base import Base, IDMixin, SoftDeleteMixin, TimestampMixin, UTCDateTime, UUIDString
-from .pet_domain import (
+from .pets import (
     ConfidenceLevel,
     IdentificationTag,
     InheritanceMode,

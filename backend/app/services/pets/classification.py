@@ -3,9 +3,9 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.errors import BusinessError, ErrorCode
-from ..models import IdentificationTag, PersonalGene, PersonalSpecies
-from ..schemas.pet import (
+from ...core.errors import BusinessError, ErrorCode
+from ...models import IdentificationTag, PersonalGene, PersonalSpecies
+from ...schemas.pets import (
     GeneCreateRequest,
     GeneUpdateRequest,
     SpeciesCreateRequest,
@@ -13,7 +13,7 @@ from ..schemas.pet import (
     TagCreateRequest,
     TagUpdateRequest,
 )
-from ..utils.datetime import utc_now
+from ...utils.datetime import utc_now
 
 
 async def _get_species(session: AsyncSession, user_id: int, resource_uuid: UUID) -> PersonalSpecies | None:

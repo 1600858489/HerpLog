@@ -3,7 +3,7 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.pet import PetCreateRequest, SpeciesCreateRequest
+from app.schemas.pets import PetCreateRequest, SpeciesCreateRequest
 
 
 def test_pet_create_requires_species_but_allows_unnamed_pet() -> None:

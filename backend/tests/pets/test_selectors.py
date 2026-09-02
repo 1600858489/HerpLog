@@ -1,7 +1,7 @@
 from app.core.pagination import PaginationParams
 from app.models import PersonalSpecies, Pet, User
-from app.schemas.pet import PetListFilters
-from app.selectors.pet import get_pet_by_uuid, list_pets
+from app.schemas.pets import PetListFilters
+from app.selectors.pets import get_pet_by_uuid, list_pets
 
 
 async def test_pet_selector_cannot_return_another_users_pet(async_session_factory) -> None:

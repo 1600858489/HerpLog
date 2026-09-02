@@ -4,8 +4,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.errors import BusinessError, ErrorCode
-from ..models import (
+from ...core.errors import BusinessError, ErrorCode
+from ...models import (
     ManagementUnit,
     Pet,
     PetLifeStage,
@@ -14,7 +14,7 @@ from ..models import (
     PetOriginType,
     PetParentRole,
 )
-from ..schemas.pet import (
+from ...schemas.pets import (
     AssignmentCreateRequest,
     AssignmentMoveRequest,
     LifeStageCreateRequest,
@@ -22,8 +22,8 @@ from ..schemas.pet import (
     OriginCreateRequest,
     OriginUpdateRequest,
 )
-from ..selectors import get_management_unit_by_uuid, get_pet_by_uuid
-from ..utils.datetime import utc_now
+from ...selectors import get_management_unit_by_uuid, get_pet_by_uuid
+from ...utils.datetime import utc_now
 
 
 async def _get_active_assignment(

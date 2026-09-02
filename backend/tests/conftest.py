@@ -20,7 +20,6 @@ from app.models import (
     User,
 )
 
-import app.models.pet_domain
 from app.models.base import Base
 from main import app
 

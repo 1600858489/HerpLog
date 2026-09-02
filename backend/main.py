@@ -6,7 +6,7 @@ from app.core.config import get_settings
 from app.core.response import ResponseEnvelope, success_response
 from app.infra.database import create_all_tables
 from app.middlewares import RequestLoggingMiddleware, register_cors, register_exception_handlers
-from app.views import auth_router
+from app.views import auth_router, pet_router
 
 
 @asynccontextmanager
@@ -23,6 +23,7 @@ register_exception_handlers(app)
 register_cors(app, settings)
 app.add_middleware(RequestLoggingMiddleware)
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(pet_router, prefix="/api/v1", tags=["pets"])
 
 
 @app.get("/", response_model=ResponseEnvelope[dict[str, str]])

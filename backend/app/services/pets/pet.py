@@ -3,8 +3,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.errors import BusinessError, ErrorCode
-from ..models import (
+from ...core.errors import BusinessError, ErrorCode
+from ...models import (
     IdentificationTag,
     PersonalGene,
     Pet,
@@ -14,9 +14,9 @@ from ..models import (
     PetManagementAssignment,
     PetOrigin,
 )
-from ..schemas.pet import PetCreateRequest, PetUpdateRequest
-from ..selectors import get_gene_by_uuid, get_pet_by_uuid, get_species_by_uuid, get_tag_by_uuid
-from ..utils.datetime import utc_now
+from ...schemas.pets import PetCreateRequest, PetUpdateRequest
+from ...selectors import get_gene_by_uuid, get_pet_by_uuid, get_species_by_uuid, get_tag_by_uuid
+from ...utils.datetime import utc_now
 
 
 async def _generate_pet_code(session: AsyncSession, user_id: int) -> str:

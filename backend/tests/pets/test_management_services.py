@@ -11,8 +11,8 @@ from app.models import (
     PetManagementAssignment,
     User,
 )
-from app.schemas.pet import ManagementUnitTypeUpdateRequest
-from app.services.management import clear_and_delete_management_unit, update_management_unit_type
+from app.schemas.pets import ManagementUnitTypeUpdateRequest
+from app.services.pets.management import clear_and_delete_management_unit, update_management_unit_type
 from app.utils.datetime import utc_now
 
 

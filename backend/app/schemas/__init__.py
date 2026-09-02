@@ -1,6 +1,6 @@
 from .auth import AuthResponse, LoginRequest, LogoutRequest, RefreshRequest, RegisterRequest, UserResponse
 from .base import BaseRequestSchema
-from .pet import (
+from .pets import (
     AssignmentCreateRequest,
     AssignmentMoveRequest,
     AssignmentResponse,

@@ -1,8 +1,8 @@
 import pytest
 
 from app.core.errors import BusinessError, ErrorCode
-from app.schemas.pet import SpeciesCreateRequest
-from app.services.classification import create_species
+from app.schemas.pets import SpeciesCreateRequest
+from app.services.pets.classification import create_species
 from app.models import User
 
 

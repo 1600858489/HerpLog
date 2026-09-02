@@ -3,10 +3,10 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..core.errors import BusinessError, ErrorCode
-from ..models import ManagementUnit, ManagementUnitType, PetManagementAssignment
-from ..schemas.pet import ManagementUnitTypeUpdateRequest
-from ..utils.datetime import utc_now
+from ...core.errors import BusinessError, ErrorCode
+from ...models import ManagementUnit, ManagementUnitType, PetManagementAssignment
+from ...schemas.pets import ManagementUnitTypeUpdateRequest
+from ...utils.datetime import utc_now
 
 
 async def _get_user_unit_type(
