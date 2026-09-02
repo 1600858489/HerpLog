@@ -21,6 +21,12 @@ class AssignmentMoveRequest(AssignmentCreateRequest):
     """Validate moving a pet to another management unit."""
 
 
+class AssignmentEndRequest(BaseRequestSchema):
+    """Validate the timestamp used to end an active management assignment."""
+
+    ended_at: datetime
+
+
 class AssignmentResponse(BaseModel):
     """Serialize one historical management assignment."""
 
@@ -66,6 +72,6 @@ class LifeStageResponse(BaseModel):
 
 
 __all__ = [
-    "AssignmentCreateRequest", "AssignmentMoveRequest", "AssignmentResponse",
+    "AssignmentCreateRequest", "AssignmentEndRequest", "AssignmentMoveRequest", "AssignmentResponse",
     "LifeStageCreateRequest", "LifeStageResponse", "LifeStageUpdateRequest",
 ]

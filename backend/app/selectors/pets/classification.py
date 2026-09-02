@@ -41,3 +41,23 @@ async def get_tag_by_uuid(session: AsyncSession, user_id: int, tag_uuid: UUID) -
         IdentificationTag.uuid == tag_uuid, IdentificationTag.user_id == user_id, IdentificationTag.deleted_at.is_(None)
     ))
     return result.scalar_one_or_none()
+
+
+async def list_genes(session: AsyncSession, user_id: int) -> list[PersonalGene]:
+    """Return active reusable genes owned by the current user."""
+    result = await session.execute(
+        select(PersonalGene)
+        .where(PersonalGene.user_id == user_id, PersonalGene.deleted_at.is_(None))
+        .order_by(PersonalGene.name, PersonalGene.id)
+    )
+    return list(result.scalars().all())
+
+
+async def list_tags(session: AsyncSession, user_id: int) -> list[IdentificationTag]:
+    """Return active identification tags owned by the current user."""
+    result = await session.execute(
+        select(IdentificationTag)
+        .where(IdentificationTag.user_id == user_id, IdentificationTag.deleted_at.is_(None))
+        .order_by(IdentificationTag.name, IdentificationTag.id)
+    )
+    return list(result.scalars().all())

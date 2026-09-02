@@ -11,8 +11,26 @@ from app.models import (
     PetManagementAssignment,
     User,
 )
-from app.schemas.pets import ManagementUnitTypeUpdateRequest
-from app.services.pets.management import clear_and_delete_management_unit, update_management_unit_type
+from app.schemas.pets import ManagementUnitTypeCreateRequest, ManagementUnitTypeUpdateRequest
+from app.services.pets.management import (
+    clear_and_delete_management_unit,
+    create_management_unit_type,
+    update_management_unit_type,
+)
+
+
+async def test_custom_management_unit_type_cannot_duplicate_system_name(async_session_factory) -> None:
+    async with async_session_factory() as session:
+        system_type = ManagementUnitType(name="生态缸", is_system=True, user_id=None)
+        session.add(system_type)
+        await session.flush()
+        with pytest.raises(BusinessError) as error:
+            await create_management_unit_type(
+                session, 1, ManagementUnitTypeCreateRequest(name="生态缸")
+            )
+        assert error.value.error_code == ErrorCode.MANAGEMENT_UNIT_TYPE_CONFLICT
+
+
 from app.utils.datetime import utc_now
 
 

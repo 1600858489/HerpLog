@@ -4,7 +4,15 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from ...models import IdentificationTag, ManagementUnit, PersonalSpecies, Pet, PetIdentificationTag, PetManagementAssignment
+from ...models import (
+    IdentificationTag,
+    ManagementUnit,
+    PersonalSpecies,
+    Pet,
+    PetIdentificationTag,
+    PetManagementAssignment,
+    PetOrigin,
+)
 from ...schemas.pets import PetListFilters
 
 
@@ -12,7 +20,12 @@ async def get_pet_by_uuid(session: AsyncSession, user_id: int, pet_uuid: UUID, d
     """Return an active user-owned pet with scenario-specific eager loading."""
     options = [selectinload(Pet.species), selectinload(Pet.identification_tags), selectinload(Pet.assignments).selectinload(PetManagementAssignment.management_unit)]
     if detail:
-        options.extend([selectinload(Pet.genes), selectinload(Pet.origins), selectinload(Pet.life_stages)])
+        options.extend([
+            selectinload(Pet.genes),
+            selectinload(Pet.origins).selectinload(PetOrigin.parent_pet),
+            selectinload(Pet.life_stages),
+        ])
+
     result = await session.execute(select(Pet).where(
         Pet.uuid == pet_uuid, Pet.user_id == user_id, Pet.deleted_at.is_(None)
     ).options(*options))

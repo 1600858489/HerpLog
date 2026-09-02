@@ -56,6 +56,60 @@ async def test_pet_delete_soft_deletes_history(async_session_factory) -> None:
         assert assignment.deleted_at is not None
 
 
+async def test_assignment_move_rejects_started_at_before_current_assignment(async_session_factory) -> None:
+    async with async_session_factory() as session:
+        user = User(username="keeper", password_hash="hashed")
+        session.add(user)
+        await session.flush()
+        species = PersonalSpecies(user_id=user.id, common_name="龟")
+        first_type = ManagementUnitType(user_id=user.id, name="龟池一", is_system=False)
+        second_type = ManagementUnitType(user_id=user.id, name="龟池二", is_system=False)
+        session.add_all([species, first_type, second_type])
+        await session.flush()
+        pet = await create_pet(session, user.id, PetCreateRequest(species_uuid=species.uuid))
+        first_unit = ManagementUnit(user_id=user.id, type_id=first_type.id, unit_code="POOL-001")
+        second_unit = ManagementUnit(user_id=user.id, type_id=second_type.id, unit_code="POOL-002")
+        session.add_all([first_unit, second_unit])
+        await session.flush()
+        started_at = utc_now() - timedelta(days=1)
+        session.add(PetManagementAssignment(pet_id=pet.id, management_unit_id=first_unit.id, started_at=started_at))
+        await session.commit()
+        with pytest.raises(BusinessError) as error:
+            await move_pet(
+                session,
+                user.id,
+                pet.uuid,
+                AssignmentMoveRequest(
+                    management_unit_uuid=second_unit.uuid,
+                    started_at=started_at - timedelta(minutes=1),
+                ),
+            )
+        assert error.value.error_code == ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE
+
+
+async def test_assignment_removal_rejects_ended_at_before_started_at(async_session_factory) -> None:
+    from app.services.pets.lifecycle import remove_pet_from_management_unit
+
+    async with async_session_factory() as session:
+        user = User(username="keeper", password_hash="hashed")
+        session.add(user)
+        await session.flush()
+        species = PersonalSpecies(user_id=user.id, common_name="龟")
+        unit_type = ManagementUnitType(user_id=user.id, name="龟池", is_system=False)
+        session.add_all([species, unit_type])
+        await session.flush()
+        pet = await create_pet(session, user.id, PetCreateRequest(species_uuid=species.uuid))
+        unit = ManagementUnit(user_id=user.id, type_id=unit_type.id, unit_code="POOL-001")
+        session.add(unit)
+        await session.flush()
+        started_at = utc_now()
+        session.add(PetManagementAssignment(pet_id=pet.id, management_unit_id=unit.id, started_at=started_at))
+        await session.commit()
+        with pytest.raises(BusinessError) as error:
+            await remove_pet_from_management_unit(session, user.id, pet.uuid, started_at)
+        assert error.value.error_code == ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE
+
+
 async def test_overlapping_management_assignment_is_rejected(async_session_factory) -> None:
     async with async_session_factory() as session:
         user = User(username="keeper", password_hash="hashed")

@@ -2,6 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ...models import PetSex
 from ..base import BaseRequestSchema
 from .classification import GeneResponse, IdentificationTagSummary, SpeciesSummary
 from .lifecycle import AssignmentResponse, LifeStageResponse
@@ -13,7 +14,7 @@ class PetCreateRequest(BaseRequestSchema):
     """Validate creation of a pet identified by a personal species."""
 
     species_uuid: UUID
-    sex: str = "unknown"
+    sex: PetSex = PetSex.UNKNOWN
     name: str | None = Field(default=None, max_length=255)
     pet_code: str | None = Field(default=None, max_length=64)
     identification_note: str | None = Field(default=None, max_length=1000)
@@ -26,7 +27,7 @@ class PetUpdateRequest(BaseRequestSchema):
     """Validate editable pet base fields."""
 
     species_uuid: UUID | None = None
-    sex: str | None = None
+    sex: PetSex | None = None
     name: str | None = Field(default=None, max_length=255)
     pet_code: str | None = Field(default=None, max_length=64)
     identification_note: str | None = Field(default=None, max_length=1000)

@@ -2,6 +2,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 
+from ...models import InheritanceMode
 from ..base import BaseRequestSchema
 
 
@@ -33,8 +34,36 @@ class SpeciesCreateRequest(BaseRequestSchema):
         return normalized or None
 
 
-class SpeciesUpdateRequest(SpeciesCreateRequest):
-    """Validate editable species fields."""
+class SpeciesUpdateRequest(BaseRequestSchema):
+    """Validate optional updates to a personal species."""
+
+    common_name: str | None = Field(default=None, min_length=1, max_length=255)
+    scientific_name: str | None = Field(default=None, max_length=255)
+    kingdom: str | None = Field(default=None, max_length=255)
+    phylum: str | None = Field(default=None, max_length=255)
+    class_name: str | None = Field(default=None, max_length=255)
+    order_name: str | None = Field(default=None, max_length=255)
+    family: str | None = Field(default=None, max_length=255)
+    genus: str | None = Field(default=None, max_length=255)
+    species_name: str | None = Field(default=None, max_length=255)
+    subspecies: str | None = Field(default=None, max_length=255)
+    note: str | None = Field(default=None, max_length=1000)
+
+
+class GeneUpdateRequest(BaseRequestSchema):
+    """Validate optional updates to a personal gene."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    phenotype: str | None = Field(default=None, max_length=255)
+    genotype: str | None = Field(default=None, max_length=255)
+    inheritance_mode: InheritanceMode | None = None
+    note: str | None = Field(default=None, max_length=1000)
+
+
+class TagUpdateRequest(BaseRequestSchema):
+    """Validate an optional identification-tag rename."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=255)
 
 
 class SpeciesResponse(BaseModel):
@@ -62,12 +91,8 @@ class GeneCreateRequest(BaseRequestSchema):
     name: str = Field(min_length=1, max_length=255)
     phenotype: str | None = Field(default=None, max_length=255)
     genotype: str | None = Field(default=None, max_length=255)
-    inheritance_mode: str | None = Field(default=None, max_length=32)
+    inheritance_mode: InheritanceMode | None = None
     note: str | None = Field(default=None, max_length=1000)
-
-
-class GeneUpdateRequest(GeneCreateRequest):
-    """Validate editable gene fields."""
 
 
 class GeneResponse(BaseModel):
@@ -87,10 +112,6 @@ class TagCreateRequest(BaseRequestSchema):
     """Validate a reusable personal identification tag."""
 
     name: str = Field(min_length=1, max_length=255)
-
-
-class TagUpdateRequest(TagCreateRequest):
-    """Validate an editable identification tag."""
 
 
 class TagResponse(BaseModel):

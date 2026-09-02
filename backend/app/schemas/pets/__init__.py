@@ -13,6 +13,7 @@ from .classification import (
 )
 from .lifecycle import (
     AssignmentCreateRequest,
+    AssignmentEndRequest,
     AssignmentMoveRequest,
     AssignmentResponse,
     LifeStageCreateRequest,
@@ -32,7 +33,7 @@ from .origin import OriginCreateRequest, OriginResponse, OriginUpdateRequest
 from .pet import PetCreateRequest, PetListFilters, PetListResponse, PetResponse, PetUpdateRequest
 
 __all__ = [
-    "AssignmentCreateRequest", "AssignmentMoveRequest", "AssignmentResponse",
+    "AssignmentCreateRequest", "AssignmentEndRequest", "AssignmentMoveRequest", "AssignmentResponse",
     "GeneCreateRequest", "GeneResponse", "GeneUpdateRequest", "IdentificationTagSummary",
     "LifeStageCreateRequest", "LifeStageResponse", "LifeStageUpdateRequest",
     "ManagementUnitCreateRequest", "ManagementUnitResponse", "ManagementUnitSummary",

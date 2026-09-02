@@ -81,6 +81,8 @@ async def move_pet(
         raise BusinessError(ErrorCode.MANAGEMENT_UNIT_NOT_FOUND)
     if target.id == current.management_unit_id:
         raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE)
+    if request.started_at <= current.started_at:
+        raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE)
     current.ended_at = request.started_at
     await session.flush()
     return await create_assignment(session, user_id, pet_uuid, request)
@@ -93,6 +95,8 @@ async def remove_pet_from_management_unit(
     current = await _get_active_assignment(session, user_id, pet_uuid)
     if current is None:
         raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_NOT_FOUND)
+    if ended_at <= current.started_at:
+        raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE)
     current.ended_at = ended_at
     await session.flush()
 
@@ -125,6 +129,33 @@ async def create_life_stage(
         note=request.note,
     )
     session.add(stage)
+    await session.flush()
+    return stage
+
+
+async def update_life_stage(
+    session: AsyncSession,
+    user_id: int,
+    pet_uuid: UUID,
+    stage_uuid: UUID,
+    request: LifeStageUpdateRequest,
+) -> PetLifeStage:
+    """Update descriptive fields on one active life-stage record."""
+    pet = await get_pet_by_uuid(session, user_id, pet_uuid)
+    if pet is None:
+        raise BusinessError(ErrorCode.PET_NOT_FOUND)
+    result = await session.execute(
+        select(PetLifeStage).where(
+            PetLifeStage.uuid == stage_uuid,
+            PetLifeStage.pet_id == pet.id,
+            PetLifeStage.deleted_at.is_(None),
+        )
+    )
+    stage = result.scalar_one_or_none()
+    if stage is None:
+        raise BusinessError(ErrorCode.PET_STATE_NOT_FOUND)
+    for field, value in request.model_dump(exclude_unset=True).items():
+        setattr(stage, field, value)
     await session.flush()
     return stage
 
@@ -208,9 +239,17 @@ async def update_origin(
     origin = result.scalar_one_or_none()
     if origin is None:
         raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_NOT_FOUND)
-    for field, value in request.model_dump().items():
-        if field == "parent_pet_uuid":
-            continue
+    if "parent_pet_uuid" in request.model_fields_set:
+        parent_pet_id = None
+        if request.parent_pet_uuid is not None:
+            parent = await get_pet_by_uuid(session, user_id, request.parent_pet_uuid)
+            if parent is None or parent.id == pet.id:
+                raise BusinessError(ErrorCode.ORIGIN_OR_ASSIGNMENT_INVALID_STATE)
+            parent_pet_id = parent.id
+        origin.parent_pet_id = parent_pet_id
+    for field, value in request.model_dump(
+        exclude={"parent_pet_uuid"}, exclude_unset=True
+    ).items():
         setattr(origin, field, value)
     await session.flush()
     return origin
@@ -225,7 +264,7 @@ async def soft_delete_origin(
         user_id,
         pet_uuid,
         origin_uuid,
-        OriginUpdateRequest(origin_type=PetOriginType.UNKNOWN.value),
+        OriginUpdateRequest(),
     )
     origin.deleted_at = utc_now()
     await session.flush()
@@ -239,5 +278,6 @@ __all__ = [
     "move_pet",
     "remove_pet_from_management_unit",
     "soft_delete_origin",
+    "update_life_stage",
     "update_origin",
 ]

@@ -2,6 +2,7 @@ from .auth import AuthResponse, LoginRequest, LogoutRequest, RefreshRequest, Reg
 from .base import BaseRequestSchema
 from .pets import (
     AssignmentCreateRequest,
+    AssignmentEndRequest,
     AssignmentMoveRequest,
     AssignmentResponse,
     GeneCreateRequest,
@@ -36,6 +37,7 @@ from .pets import (
 
 __all__ = [
     "AssignmentCreateRequest",
+    "AssignmentEndRequest",
     "AssignmentMoveRequest",
     "AssignmentResponse",
     "AuthResponse",

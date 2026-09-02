@@ -71,7 +71,7 @@ async def update_species(session: AsyncSession, user_id: int, species_uuid: UUID
     species = await _get_species(session, user_id, species_uuid)
     if species is None:
         raise BusinessError(ErrorCode.SPECIES_NOT_FOUND)
-    if request.common_name != species.common_name:
+    if request.common_name is not None and request.common_name != species.common_name:
         duplicate = await session.execute(
             select(PersonalSpecies).where(
                 PersonalSpecies.user_id == user_id,
@@ -82,7 +82,7 @@ async def update_species(session: AsyncSession, user_id: int, species_uuid: UUID
         )
         if duplicate.scalar_one_or_none() is not None:
             raise BusinessError(ErrorCode.SPECIES_CONFLICT)
-    for field, value in request.model_dump().items():
+    for field, value in request.model_dump(exclude_unset=True).items():
         setattr(species, field, value)
     await session.flush()
     return species
@@ -99,6 +99,15 @@ async def soft_delete_species(session: AsyncSession, user_id: int, species_uuid:
 
 async def create_gene(session: AsyncSession, user_id: int, request: GeneCreateRequest) -> PersonalGene:
     """Create one reusable personal gene entry."""
+    existing = await session.execute(
+        select(PersonalGene).where(
+            PersonalGene.user_id == user_id,
+            PersonalGene.name == request.name,
+            PersonalGene.deleted_at.is_(None),
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise BusinessError(ErrorCode.GENE_CONFLICT)
     gene = PersonalGene(user_id=user_id, **request.model_dump())
     session.add(gene)
     await session.flush()
@@ -110,7 +119,18 @@ async def update_gene(session: AsyncSession, user_id: int, gene_uuid: UUID, requ
     gene = await _get_gene(session, user_id, gene_uuid)
     if gene is None:
         raise BusinessError(ErrorCode.GENE_NOT_FOUND)
-    for field, value in request.model_dump().items():
+    if request.name is not None and request.name != gene.name:
+        duplicate = await session.execute(
+            select(PersonalGene).where(
+                PersonalGene.user_id == user_id,
+                PersonalGene.name == request.name,
+                PersonalGene.uuid != gene_uuid,
+                PersonalGene.deleted_at.is_(None),
+            )
+        )
+        if duplicate.scalar_one_or_none() is not None:
+            raise BusinessError(ErrorCode.GENE_CONFLICT)
+    for field, value in request.model_dump(exclude_unset=True).items():
         setattr(gene, field, value)
     await session.flush()
     return gene
@@ -127,6 +147,15 @@ async def soft_delete_gene(session: AsyncSession, user_id: int, gene_uuid: UUID)
 
 async def create_tag(session: AsyncSession, user_id: int, request: TagCreateRequest) -> IdentificationTag:
     """Create one reusable personal identification tag."""
+    existing = await session.execute(
+        select(IdentificationTag).where(
+            IdentificationTag.user_id == user_id,
+            IdentificationTag.name == request.name,
+            IdentificationTag.deleted_at.is_(None),
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise BusinessError(ErrorCode.IDENTIFICATION_TAG_CONFLICT)
     tag = IdentificationTag(user_id=user_id, **request.model_dump())
     session.add(tag)
     await session.flush()
@@ -138,7 +167,18 @@ async def update_tag(session: AsyncSession, user_id: int, tag_uuid: UUID, reques
     tag = await _get_tag(session, user_id, tag_uuid)
     if tag is None:
         raise BusinessError(ErrorCode.IDENTIFICATION_TAG_NOT_FOUND)
-    tag.name = request.name
+    if request.name is not None and request.name != tag.name:
+        duplicate = await session.execute(
+            select(IdentificationTag).where(
+                IdentificationTag.user_id == user_id,
+                IdentificationTag.name == request.name,
+                IdentificationTag.uuid != tag_uuid,
+                IdentificationTag.deleted_at.is_(None),
+            )
+        )
+        if duplicate.scalar_one_or_none() is not None:
+            raise BusinessError(ErrorCode.IDENTIFICATION_TAG_CONFLICT)
+        tag.name = request.name
     await session.flush()
     return tag
 

@@ -1,4 +1,14 @@
-from .classification import create_gene, create_species, create_tag
+from .classification import (
+    create_gene,
+    create_species,
+    create_tag,
+    soft_delete_gene,
+    soft_delete_species,
+    soft_delete_tag,
+    update_gene,
+    update_species,
+    update_tag,
+)
 from .lifecycle import (
     create_assignment,
     create_life_stage,
@@ -7,9 +17,18 @@ from .lifecycle import (
     move_pet,
     remove_pet_from_management_unit,
     soft_delete_origin,
+    update_life_stage,
     update_origin,
 )
-from .management import clear_and_delete_management_unit, update_management_unit_type
+from .management import (
+    clear_and_delete_management_unit,
+    create_management_unit,
+    create_management_unit_type,
+    soft_delete_management_unit,
+    soft_delete_management_unit_type,
+    update_management_unit,
+    update_management_unit_type,
+)
 from .pet import create_pet, soft_delete_pet, update_pet
 
 __all__ = [
@@ -17,6 +36,8 @@ __all__ = [
     "create_assignment",
     "create_gene",
     "create_life_stage",
+    "create_management_unit",
+    "create_management_unit_type",
     "create_origin",
     "create_pet",
     "create_species",
@@ -24,8 +45,19 @@ __all__ = [
     "end_life_stage",
     "move_pet",
     "remove_pet_from_management_unit",
+    "soft_delete_gene",
+    "soft_delete_management_unit",
+    "soft_delete_management_unit_type",
     "soft_delete_origin",
+    "soft_delete_pet",
+    "soft_delete_species",
+    "soft_delete_tag",
+    "update_gene",
+    "update_management_unit",
     "update_management_unit_type",
+    "update_life_stage",
     "update_origin",
     "update_pet",
+    "update_species",
+    "update_tag",
 ]
