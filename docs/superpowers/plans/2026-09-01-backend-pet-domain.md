@@ -1,6 +1,6 @@
 # 后端宠物域实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 在现有认证和核心基础设施之上，实现面向个人玩家的结构化宠物管理 API，支持个体管理、扁平管理单元、批量目标、分类资料、谱系来源、成长阶段和转移历史。
 
@@ -58,8 +58,6 @@ selectors/pets/{classification,pet,management,history}.py
 services/pets/{classification,pet,management,lifecycle}.py
 views/pets/{classification,management,pet,lifecycle,origin}.py
 ```
-
-## 资源和错误码接口
 
 ## 资源和错误码接口
 
@@ -133,7 +131,7 @@ views/pets/{classification,management,pet,lifecycle,origin}.py
 - `BaseCRUDService[ModelT, CreateSchemaT, UpdateSchemaT]`：提供普通创建、更新和软删除的生命周期模板。
 - 基类不猜测用户归属字段、不猜测预加载、不自动反射生成路由；具体资源通过显式参数或覆写钩子提供这些差异。
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 from uuid import UUID
@@ -151,13 +149,13 @@ def test_crud_abstractions_define_explicit_extension_points() -> None:
     assert hasattr(BaseCRUDService, "soft_delete")
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run --project .. pytest tests/test_crud.py -q`
 
 Expected: FAIL because `app.core.crud` does not exist。
 
-- [ ] **Step 3: Implement the minimal abstractions**
+- [x] **Step 3: Implement the minimal abstractions**
 
 `BaseSelector` 接受显式 `model`, `owner_column` 和 `load_options`，将 `deleted_at IS NULL`、owner 过滤、UUID 过滤、offset/limit 和 count 查询封装起来；不访问关系，不返回 Schema。
 
@@ -165,13 +163,13 @@ Expected: FAIL because `app.core.crud` does not exist。
 
 两个基类都使用完整泛型和公开类型注解，不使用 `Any` 承载核心业务数据。基类不捕获数据库异常、不创建 HTTP 响应。
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run --project .. pytest tests/test_crud.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/core/crud tests/test_crud.py
@@ -194,7 +192,7 @@ git commit -m "feat: 增加有限通用 CRUD 抽象"
 - Produces模型：`PersonalSpecies`、`PersonalGene`、`IdentificationTag`、`Pet`、`PetGene`、`PetIdentificationTag`、`ManagementUnitType`、`ManagementUnit`、`PetManagementAssignment`、`PetLifeStage`、`PetOrigin`。
 - 每个模型继承公共 Mixin；所有关系 `lazy="raise"`；所有用户私有模型包含 `user_id` 外键。
 
-- [ ] **Step 1: Write failing model tests**
+- [x] **Step 1: Write failing model tests**
 
 ```python
 from datetime import datetime, timezone
@@ -241,13 +239,13 @@ async def test_management_unit_type_and_history_models_have_relationships(
         assert unit.uuid
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/pets/test_models.py -q`
 
 Expected: FAIL because the pet-domain model module and tables are missing。
 
-- [ ] **Step 3: Implement the models**
+- [x] **Step 3: Implement the models**
 
 使用 SQLAlchemy typed mapping：
 
@@ -266,13 +264,13 @@ Expected: FAIL because the pet-domain model module and tables are missing。
 
 模型导出必须通过 `models/__init__.py`；测试 fixture 在建表前导入 `app.models`，确保 metadata 注册所有宠物域表。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/pets/test_models.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/models app/core/errors.py tests/conftest.py tests/pets/test_models.py
@@ -295,7 +293,7 @@ git commit -m "feat: 增加宠物域数据模型"
 - Produces历史 Schema：`AssignmentCreateRequest`、`AssignmentMoveRequest`、`AssignmentResponse`、`LifeStageCreateRequest`、`LifeStageUpdateRequest`、`LifeStageResponse`、`OriginCreateRequest`、`OriginUpdateRequest`、`OriginResponse`。
 - 所有请求继承 `BaseRequestSchema`；所有响应只包含 uuid，不包含 id/user_id/password 等内部字段。
 
-- [ ] **Step 1: Write failing schema tests**
+- [x] **Step 1: Write failing schema tests**
 
 ```python
 import pytest
@@ -323,13 +321,13 @@ def test_species_scientific_fields_are_optional() -> None:
     assert request.kingdom is None
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/pets/test_schemas.py -q`
 
 Expected: FAIL because pet-domain schemas are missing。
 
-- [ ] **Step 3: Implement typed request and response schemas**
+- [x] **Step 3: Implement typed request and response schemas**
 
 UUID 输入字段使用 `UUID` 类型；`PetCreateRequest.species_uuid` 必填，`sex` 默认 `unknown`；name、pet_code、classification、gene、tag、management unit、origin 和 life stage 均按设计可选。科学分类字段不设置必填链式校验。
 
@@ -337,13 +335,13 @@ UUID 输入字段使用 `UUID` 类型；`PetCreateRequest.species_uuid` 必填�
 
 `UserResponse` 风格的 ORM 序列化使用 `ConfigDict(from_attributes=True)`；不要让响应 Schema 继承 `BaseRequestSchema`。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/pets/test_schemas.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/schemas tests/pets/test_schemas.py
@@ -372,7 +370,7 @@ git commit -m "feat: 定义宠物域序列化器"
 - `list_pet_origins(session, user_id, pet_uuid, params) -> tuple[list[PetOrigin], int]`
 - `get_active_pet_ids_by_management_unit(session, user_id, management_unit_uuid) -> list[int]`
 
-- [ ] **Step 1: Write failing selector tests**
+- [x] **Step 1: Write failing selector tests**
 
 ```python
 from uuid import uuid4
@@ -408,13 +406,13 @@ async def test_pet_list_returns_pagination_count(async_session_factory) -> None:
         assert total == 3
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/pets/test_selectors.py -q`
 
 Expected: FAIL because selectors are missing。
 
-- [ ] **Step 3: Implement selectors**
+- [x] **Step 3: Implement selectors**
 
 每个用户私有查询的 where 条件同时包含 owner 和 `deleted_at IS NULL`；UUID 查询直接在 SQL 中绑定两个条件。宠物列表按 `created_at DESC, id DESC` 稳定排序，支持 species、sex、management_unit、assigned/unassigned、tag 和 pet_code/name 关键词筛选。
 
@@ -429,13 +427,13 @@ Expected: FAIL because selectors are missing。
 
 Selector 内不 commit、不写模型、不做 Serializer 转换；所有公共函数从 `selectors/__init__.py` 导出。测试验证未显式预加载的关系访问会触发 `lazy="raise"`。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/pets/test_selectors.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/selectors tests/pets/test_selectors.py
@@ -460,7 +458,7 @@ git add app/selectors tests/pets/test_selectors.py
 - `create_tag/update_tag/soft_delete_tag`
 - 所有写入属于当前用户，所有冲突抛出对应 `BusinessError`。
 
-- [ ] **Step 1: Write failing service tests**
+- [x] **Step 1: Write failing service tests**
 
 ```python
 import pytest
@@ -488,25 +486,25 @@ async def test_different_users_can_have_same_species_name(async_session_factory)
         assert first.uuid != second.uuid
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/test_pet_classification_services.py -q`
 
 Expected: FAIL because classification Service is missing。
 
-- [ ] **Step 3: Implement classification Service**
+- [x] **Step 3: Implement classification Service**
 
 使用 Selector 查询用户范围冲突；normalize text 后创建/更新。删除已被宠物或基因关联使用的分类项时，不物理删除，只设置 `deleted_at`，并在后续创建关联时拒绝已删除项。基因和标签按同样模式实现，但保持各自错误码和 Schema，不创建过度通用的动态 Service。
 
 Service 负责 commit，业务 View 不管理事务。跨模块只从 `selectors`/`services` 的 `__init__.py` 导入。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/test_pet_classification_services.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/services/pets/classification.py app/services/__init__.py app/core/errors.py tests/test_pet_classification_services.py
@@ -530,7 +528,7 @@ git commit -m "feat: 实现用户私有宠物分类资料"
 - `clear_and_delete_management_unit(session, user_id, unit_uuid) -> None`
 - `get_management_unit_members(session, user_id, unit_uuid, params) -> tuple[list[Pet], int]`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 ```python
 import pytest
@@ -580,13 +578,13 @@ async def test_clear_and_delete_leaves_pets_unassigned(async_session_factory) ->
 
 测试文件需要定义完整的 `create_management_unit_for_test` 和 `create_pet_assigned_for_test` fixture/helper，不能使用未定义占位符；helper 只负责准备真实模型，不写入生产代码。
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/test_management_services.py -q`
 
 Expected: FAIL because management Service is missing。
 
-- [ ] **Step 3: Implement management Service**
+- [x] **Step 3: Implement management Service**
 
 系统类型只能查询和选择，不能由普通用户修改/软删除；用户自定义类型允许修改和软删除。类型名称按系统全局或用户范围检查冲突。
 
@@ -594,13 +592,13 @@ Expected: FAIL because management Service is missing。
 
 如果清空过程中任何业务校验失败，Service 不提交部分状态。成员列表只返回当前有效 assignment 的宠物，所有查询绑定用户。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/test_management_services.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/services/pets/management.py tests/test_management_services.py
@@ -628,7 +626,7 @@ git commit -m "feat: 实现扁平管理单元服务"
 - `create_origin/update_origin/soft_delete_origin`
 - `create_assignment(session, user_id, pet_uuid, request) -> PetManagementAssignment`
 
-- [ ] **Step 1: Write failing Service tests**
+- [x] **Step 1: Write failing Service tests**
 
 ```python
 from datetime import timedelta
@@ -712,13 +710,13 @@ async def test_overlapping_management_assignment_is_rejected(async_session_facto
 
 测试中所有 helper 必须在测试文件内完整定义或改为 pytest fixture；不得保留 `_for_test` 未定义调用。测试需使用真实模型和临时 SQLite，不 mock Selector/数据库。
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/pets/test_services.py -q`
 
 Expected: FAIL because pet/lifecycle Service is missing。
 
-- [ ] **Step 3: Implement Pet Service**
+- [x] **Step 3: Implement Pet Service**
 
 创建宠物时：
 
@@ -744,13 +742,13 @@ Expected: FAIL because pet/lifecycle Service is missing。
 
 所有时间比较使用 UTC aware datetime。所有状态变更由单一 Service 事务边界完成，不通过异常捕获判断重叠或不存在。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/pets/test_services.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/services/pets/pet.py app/services/pets/lifecycle.py app/services/__init__.py tests/pets/test_services.py
@@ -772,7 +770,7 @@ git commit -m "feat: 实现宠物个体与生命周期服务"
 - View 使用 `Depends(get_current_user)` 和 `Depends(get_db_session)`；只解析 Schema、调用 Service/Selector、序列化响应和构造 envelope。
 - 不在 View 中写业务判断、owner 比较、事务或 `try/except`。
 
-- [ ] **Step 1: Write failing API tests**
+- [x] **Step 1: Write failing API tests**
 
 ```python
 async def test_create_and_list_unnamed_pet(client) -> None:
@@ -800,13 +798,13 @@ async def test_pet_list_is_paginated(client) -> None:
 
 测试文件必须定义完整的认证注册/登录 fixture 和 `create_species_via_api`、`auth_headers`，不使用省略号或未定义 helper。
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `uv run --project .. pytest tests/pets/test_api.py -q`
 
 Expected: FAIL because pet router is not mounted。
 
-- [ ] **Step 3: Implement View and route registration**
+- [x] **Step 3: Implement View and route registration**
 
 实现以下端点并为每个端点声明明确 response_model：
 
@@ -831,13 +829,13 @@ GET/POST/PATCH/DELETE /api/v1/pets/{pet_uuid}/origins
 
 挂载方式：`app.include_router(pet_router, prefix="/api/v1", tags=["pets"])`，入口从 `app.views` 公共导出导入。
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `uv run --project .. pytest tests/pets/test_api.py -q`
 
 Expected: PASS。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/views app/main.py main.py tests/pets/test_api.py
@@ -864,7 +862,7 @@ git add app/views ../main.py tests/pets/test_api.py
 - 产出可从 `backend` 目录启动的宠物域 API。
 - 完成跨用户隔离、未命名宠物、分页、分类资料、管理单元清空删除、转移历史、成长阶段、来源谱系和安全错误响应验收。
 
-- [ ] **Step 1: Add complete edge-case tests**
+- [x] **Step 1: Add complete edge-case tests**
 
 必须补充以下完整测试，不得使用省略号：
 
@@ -908,7 +906,7 @@ async def test_invalid_pet_request_rejects_internal_fields(client) -> None:
 
 测试 helper `register_and_login` 必须在测试文件中完整实现并返回带 `headers` 的 typed fixture result。
 
-- [ ] **Step 2: Run complete backend verification**
+- [x] **Step 2: Run complete backend verification**
 
 从 `backend` 目录运行：
 
@@ -922,7 +920,7 @@ git -C .. diff --check
 
 Expected：所有测试通过、编译成功、输出宠物域路由、没有旧绝对导入、diff 检查无输出。
 
-- [ ] **Step 3: Run real startup smoke test**
+- [x] **Step 3: Run real startup smoke test**
 
 ```bash
 DATABASE_URL=sqlite+aiosqlite:////tmp/herplog-pet-smoke.db \
@@ -931,11 +929,11 @@ DATABASE_URL=sqlite+aiosqlite:////tmp/herplog-pet-smoke.db \
 
 请求 `/health`、注册、创建用户私有 species、创建无名称 pet、分页列表和跨用户读取；结束服务后删除临时数据库文件。启动必须从 `backend` 目录执行。
 
-- [ ] **Step 4: Synchronize README**
+- [x] **Step 4: Synchronize README**
 
 只记录已经实现的宠物域路由、`cd backend` 启动命令、测试命令和私有数据隔离规则。明确社区公共资料、文件上传、事件域和生产 Redis/PG 适配仍未实现。
 
-- [ ] **Step 5: Run final verification**
+- [x] **Step 5: Run final verification**
 
 ```bash
 uv run --project .. pytest -q
@@ -946,7 +944,7 @@ git -C .. status --short
 
 Expected：测试全部通过、编译成功、diff 检查无输出；确认没有临时数据库、上传文件或真实密钥被纳入工作区。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add ../README.md tests/pets/test_api.py tests/pets/test_selectors.py tests/pets/test_services.py
