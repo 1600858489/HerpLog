@@ -6,20 +6,53 @@
 - [uv](https://docs.astral.sh/uv/)
 - Node.js 与 npm
 
-## 后端
+## 开发依赖
 
-从仓库根目录安装 Python 依赖：
-
-```bash
-uv sync
-```
-
-启动 API：
+复制环境模板并填写 PostgreSQL 密码：
 
 ```bash
-cd backend
-uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+cp .env.example .env
 ```
+
+在 `.env` 中设置以下值：
+
+```dotenv
+POSTGRES_USER=herplog
+POSTGRES_PASSWORD=replace-with-a-local-secret
+POSTGRES_DB=herplog
+DATABASE_URL=postgresql+asyncpg://herplog:replace-with-a-local-secret@127.0.0.1:5432/herplog
+REDIS_URL=redis://127.0.0.1:6379/0
+```
+
+启动 PostgreSQL 与 Redis：
+
+```bash
+docker compose --env-file .env -f docker/compose.yaml --profile dev up -d --wait
+```
+
+停止依赖服务但保留数据卷：
+
+```bash
+docker compose --env-file .env -f docker/compose.yaml --profile dev down
+```
+
+## 本地前后端
+
+一键后台启动前后端，日志分别写入 `tmp/backend.log` 与 `tmp/frontend.log`：
+
+```bash
+./start.sh
+./start.sh --stop
+```
+
+或者在两个终端以前台方式分别启动：
+
+```bash
+./start-backend.sh
+./start-frontend.sh
+```
+
+前台进程使用 Ctrl+C 停止。
 
 可访问：
 
@@ -27,35 +60,22 @@ uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 http://127.0.0.1:8000
 http://127.0.0.1:8000/health
 http://127.0.0.1:8000/docs
+http://127.0.0.1:5173
 ```
 
-开发环境默认使用 SQLite，并在启动时以 SQLAlchemy `create_all()` 建表；正式迁移与 PostgreSQL 适配尚未实现。
+本地未设置 `DATABASE_URL` 时后端默认使用 SQLite；设置后使用 PostgreSQL。启动时仍以 SQLAlchemy `create_all()` 建表。
 
 运行后端检查：
 
 ```bash
-cd backend
-uv run --project .. pytest -q
-uv run --project .. python -m compileall .
-```
-
-## 前端
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-访问：
-
-```text
-http://127.0.0.1:5173
+uv run --project . pytest -q
+uv run --project . python -m compileall backend
 ```
 
 运行前端检查：
 
 ```bash
+cd frontend
 npm run typecheck
 npm test
 npm run build

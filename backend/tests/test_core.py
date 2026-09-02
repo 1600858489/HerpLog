@@ -3,6 +3,7 @@ from uuid import UUID
 
 import pytest
 from pydantic import ValidationError
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import Settings
 from app.core.errors import ErrorCode, get_error_metadata
@@ -24,6 +25,16 @@ def test_production_accepts_configured_jwt_secret() -> None:
     settings.validate_production_security()
 
 
+async def test_database_url_can_be_overridden_with_postgres_asyncpg_url(monkeypatch) -> None:
+    database_url = "postgresql+asyncpg://herplog:secret@localhost:5432/herplog"
+    monkeypatch.setenv("DATABASE_URL", database_url)
+
+    settings = Settings()
+    engine = create_async_engine(settings.database_url)
+
+    assert settings.database_url == database_url
+    assert engine.url.drivername == "postgresql+asyncpg"
+    await engine.dispose()
 
 
 def test_test_runner_is_configured() -> None:

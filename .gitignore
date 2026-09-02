@@ -35,6 +35,7 @@ ENV/
 # FastAPI/Uvicorn local files
 *.log
 logs/
+tmp/
 
 # Node and Vite
 node_modules/
