@@ -31,28 +31,35 @@
 - Create: `backend/app/core/crud/base_selector.py` — 有限的用户范围通用只读查询模板。
 - Create: `backend/app/core/crud/base_service.py` — 有限的普通创建/更新/软删除模板。
 - Create: `backend/app/core/crud/__init__.py` — 通用 CRUD 公共导出。
-- Create: `backend/app/models/pet_domain.py` — 宠物域所有 ORM 模型和枚举。
-- Modify: `backend/app/models/__init__.py` — 导出宠物域模型。
-- Create: `backend/app/schemas/pet.py` — 宠物域请求/响应 Serializer。
-- Modify: `backend/app/schemas/__init__.py` — 导出宠物域 Schema。
-- Create: `backend/app/selectors/pet.py` — 宠物域只读查询与分页。
-- Modify: `backend/app/selectors/__init__.py` — 导出宠物域 Selector 公共接口。
-- Create: `backend/app/services/pet.py` — 宠物创建、更新、删除和关联校验。
-- Create: `backend/app/services/classification.py` — 物种、基因、识别标签 CRUD。
-- Create: `backend/app/services/management.py` — 管理单元、类型和清空删除。
-- Create: `backend/app/services/lifecycle.py` — 管理单元分配、转移、成长阶段、来源谱系。
-- Modify: `backend/app/services/__init__.py` — 导出宠物域 Service 公共接口。
+- Create: `backend/app/models/pets/` — 按枚举、分类、个体、管理单元、生命周期和来源拆分 ORM 模型。
+- Modify: `backend/app/models/__init__.py` — 通过 `models.pets` 公共入口导出宠物域模型。
+- Create: `backend/app/schemas/pets/` — 按分类、管理单元、个体、生命周期和来源拆分 Serializer/Deserializer。
+- Modify: `backend/app/schemas/__init__.py` — 通过 `schemas.pets` 公共入口导出宠物域 Schema，不创建 `schemas/pet.py`。
+- Create: `backend/app/selectors/pets/` — 按分类、个体、管理单元和历史检索拆分 Selector。
+- Modify: `backend/app/selectors/__init__.py` — 通过 `selectors.pets` 公共入口导出宠物域 Selector，不创建 `selectors/pet.py`。
+- Create: `backend/app/services/pets/` — 按分类、个体、管理单元和生命周期拆分 Service。
+- Modify: `backend/app/services/__init__.py` — 通过 `services.pets` 公共入口导出宠物域 Service。
 - Modify: `backend/app/core/errors.py` — 增加 Pet 域错误码和错误文案。
-- Create: `backend/app/views/pet.py` — 宠物、分类和管理单元路由。
-- Modify: `backend/app/views/__init__.py` — 导出宠物域 Router。
+- Create: `backend/app/views/pets/` — 按资源职责拆分宠物域 View，不创建 `views/pet.py`。
+- Modify: `backend/app/views/__init__.py` — 通过 `views.pets` 公共入口导出宠物域 Router。
 - Modify: `backend/main.py` — 挂载 `/api/v1/pets` 等路由。
-- Modify: `backend/tests/conftest.py` — 导入宠物域模型，确保测试建表。
-- Create: `backend/tests/test_pet_models.py` — ORM、约束和关系策略测试。
-- Create: `backend/tests/test_pet_schemas.py` — Serializer/Deserializer 测试。
-- Create: `backend/tests/test_pet_selectors.py` — 用户隔离、分页、预加载测试。
-- Create: `backend/tests/test_pet_services.py` — 分类、管理单元、宠物和生命周期 Service 测试。
-- Create: `backend/tests/test_pet_api.py` — 宠物域 API 端到端测试。
+- Modify: `backend/tests/conftest.py` — 导入宠物域模型，确保 `create_all()` 注册表结构。
+- Create: `backend/tests/pets/` — 按模型、Schema、Selector、Service 和 API 职责拆分测试。
 - Modify: `README.md` — 补充当前已实现的宠物 API。
+
+禁止创建 `models/pet_domain.py`、`schemas/pet.py`、`selectors/pet.py`、`services/pet.py`、`views/pet.py` 等聚合文件。每个层级按职责使用子包，并通过 `__init__.py` 导出公共接口；跨包只依赖公共入口。
+
+目录约定：
+
+```text
+models/pets/{enums,classification,pet,management,lifecycle,origin}.py
+schemas/pets/{classification,management,pet,management_unit,lifecycle,origin}.py
+selectors/pets/{classification,pet,management,history}.py
+services/pets/{classification,pet,management,lifecycle}.py
+views/pets/{classification,management,pet,lifecycle,origin}.py
+```
+
+## 资源和错误码接口
 
 ## 资源和错误码接口
 
@@ -131,7 +138,7 @@
 ```python
 from uuid import UUID
 
-from backend.app.core.crud import BaseCRUDService, BaseSelector
+from app.core.crud import BaseCRUDService, BaseSelector
 
 
 def test_crud_abstractions_define_explicit_extension_points() -> None:
@@ -176,11 +183,11 @@ git commit -m "feat: 增加有限通用 CRUD 抽象"
 ### Task 2: 宠物域 ORM 模型和错误码
 
 **Files:**
-- Create: `backend/app/models/pet_domain.py`
+- Create: `backend/app/models/pets/`
 - Modify: `backend/app/models/__init__.py`
 - Modify: `backend/app/core/errors.py`
 - Modify: `backend/tests/conftest.py`
-- Create: `backend/tests/test_pet_models.py`
+- Create: `backend/tests/pets/test_models.py`
 
 **Interfaces:**
 - Produces枚举：`PetSex`、`ManagementUnitTypeScope`、`PetOriginType`、`PetParentRole`、`ConfidenceLevel`、`InheritanceMode`。
@@ -236,7 +243,7 @@ async def test_management_unit_type_and_history_models_have_relationships(
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run --project .. pytest tests/test_pet_models.py -q`
+Run: `uv run --project .. pytest tests/pets/test_models.py -q`
 
 Expected: FAIL because the pet-domain model module and tables are missing。
 
@@ -261,14 +268,14 @@ Expected: FAIL because the pet-domain model module and tables are missing。
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run --project .. pytest tests/test_pet_models.py -q`
+Run: `uv run --project .. pytest tests/pets/test_models.py -q`
 
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/models app/core/errors.py tests/conftest.py tests/test_pet_models.py
+git add app/models app/core/errors.py tests/conftest.py tests/pets/test_models.py
 git commit -m "feat: 增加宠物域数据模型"
 ```
 
@@ -277,9 +284,9 @@ git commit -m "feat: 增加宠物域数据模型"
 ### Task 3: 宠物域请求/响应 Serializer
 
 **Files:**
-- Create: `backend/app/schemas/pet.py`
+- Create: `backend/app/schemas/pets/`
 - Modify: `backend/app/schemas/__init__.py`
-- Create: `backend/tests/test_pet_schemas.py`
+- Create: `backend/tests/pets/test_schemas.py`
 
 **Interfaces:**
 - Produces分类项 Schema：`SpeciesCreateRequest`、`SpeciesUpdateRequest`、`SpeciesResponse`、`GeneCreateRequest`、`GeneUpdateRequest`、`GeneResponse`、`TagCreateRequest`、`TagUpdateRequest`、`TagResponse`。
@@ -294,7 +301,7 @@ git commit -m "feat: 增加宠物域数据模型"
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.pet import PetCreateRequest, SpeciesCreateRequest
+from app.schemas.pets import PetCreateRequest, SpeciesCreateRequest
 
 
 def test_pet_create_requires_species_but_allows_unnamed_pet() -> None:
@@ -318,7 +325,7 @@ def test_species_scientific_fields_are_optional() -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run --project .. pytest tests/test_pet_schemas.py -q`
+Run: `uv run --project .. pytest tests/pets/test_schemas.py -q`
 
 Expected: FAIL because pet-domain schemas are missing。
 
@@ -332,14 +339,14 @@ UUID 输入字段使用 `UUID` 类型；`PetCreateRequest.species_uuid` 必填�
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run --project .. pytest tests/test_pet_schemas.py -q`
+Run: `uv run --project .. pytest tests/pets/test_schemas.py -q`
 
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/schemas tests/test_pet_schemas.py
+git add app/schemas tests/pets/test_schemas.py
 git commit -m "feat: 定义宠物域序列化器"
 ```
 
@@ -348,9 +355,9 @@ git commit -m "feat: 定义宠物域序列化器"
 ### Task 4: Pet Selector、分类 Selector 和用户隔离
 
 **Files:**
-- Create: `backend/app/selectors/pet.py`
+- Create: `backend/app/selectors/pets/`
 - Modify: `backend/app/selectors/__init__.py`
-- Create: `backend/tests/test_pet_selectors.py`
+- Create: `backend/tests/pets/test_selectors.py`
 
 **Interfaces:**
 - `get_species_by_uuid(session, user_id, species_uuid) -> PersonalSpecies | None`
@@ -371,8 +378,8 @@ git commit -m "feat: 定义宠物域序列化器"
 from uuid import uuid4
 
 from app.models import PersonalSpecies, Pet
-from app.selectors.pet import get_pet_by_uuid, list_pets
-from app.schemas.pet import PetListFilters
+from app.selectors.pets import get_pet_by_uuid, list_pets
+from app.schemas.pets import PetListFilters
 from app.core.pagination import PaginationParams
 
 
@@ -403,7 +410,7 @@ async def test_pet_list_returns_pagination_count(async_session_factory) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run --project .. pytest tests/test_pet_selectors.py -q`
+Run: `uv run --project .. pytest tests/pets/test_selectors.py -q`
 
 Expected: FAIL because selectors are missing。
 
@@ -424,14 +431,14 @@ Selector 内不 commit、不写模型、不做 Serializer 转换；所有公共�
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run --project .. pytest tests/test_pet_selectors.py -q`
+Run: `uv run --project .. pytest tests/pets/test_selectors.py -q`
 
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/selectors tests/test_pet_selectors.py
+git add app/selectors tests/pets/test_selectors.py
  git commit -m "feat: 增加宠物域隔离检索"
 ```
 
@@ -440,7 +447,7 @@ git add app/selectors tests/test_pet_selectors.py
 ### Task 5: 分类资料 Service
 
 **Files:**
-- Create: `backend/app/services/classification.py`
+- Create: `backend/app/services/pets/classification.py`
 - Modify: `backend/app/services/__init__.py`
 - Modify: `backend/app/core/errors.py`
 - Create: `backend/tests/test_pet_classification_services.py`
@@ -459,8 +466,8 @@ git add app/selectors tests/test_pet_selectors.py
 import pytest
 
 from app.core.errors import BusinessError, ErrorCode
-from app.schemas.pet import SpeciesCreateRequest
-from app.services.classification import create_species
+from app.schemas.pets import SpeciesCreateRequest
+from app.services.pets.classification import create_species
 
 
 async def test_species_is_private_and_duplicate_name_is_rejected(async_session_factory) -> None:
@@ -502,7 +509,7 @@ Expected: PASS。
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/services/classification.py app/services/__init__.py app/core/errors.py tests/test_pet_classification_services.py
+git add app/services/pets/classification.py app/services/__init__.py app/core/errors.py tests/test_pet_classification_services.py
 git commit -m "feat: 实现用户私有宠物分类资料"
 ```
 
@@ -511,7 +518,7 @@ git commit -m "feat: 实现用户私有宠物分类资料"
 ### Task 6: 管理单元和类型 Service
 
 **Files:**
-- Create: `backend/app/services/management.py`
+- Create: `backend/app/services/pets/management.py`
 - Create: `backend/tests/test_management_services.py`
 
 **Interfaces:**
@@ -531,8 +538,8 @@ from datetime import timedelta
 
 from app.core.errors import BusinessError, ErrorCode
 from app.models import ManagementUnit, ManagementUnitType, PersonalSpecies, Pet, PetManagementAssignment, User
-from app.schemas.pet import ManagementUnitTypeUpdateRequest
-from app.services.management import clear_and_delete_management_unit, update_management_unit_type
+from app.schemas.pets import ManagementUnitTypeUpdateRequest
+from app.services.pets.management import clear_and_delete_management_unit, update_management_unit_type
 from app.utils.datetime import utc_now
 
 
@@ -596,7 +603,7 @@ Expected: PASS。
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/services/management.py tests/test_management_services.py
+git add app/services/pets/management.py tests/test_management_services.py
 git commit -m "feat: 实现扁平管理单元服务"
 ```
 
@@ -605,10 +612,10 @@ git commit -m "feat: 实现扁平管理单元服务"
 ### Task 7: 宠物核心 Service 和生命周期 Service
 
 **Files:**
-- Create: `backend/app/services/pet.py`
-- Create: `backend/app/services/lifecycle.py`
+- Create: `backend/app/services/pets/`
+- Create: `backend/app/services/pets/lifecycle.py`
 - Modify: `backend/app/services/__init__.py`
-- Create: `backend/tests/test_pet_services.py`
+- Create: `backend/tests/pets/test_services.py`
 
 **Interfaces:**
 - `create_pet(session, user_id, request) -> Pet`
@@ -630,9 +637,9 @@ import pytest
 
 from app.core.errors import BusinessError, ErrorCode
 from app.models import ManagementUnit, ManagementUnitType, PersonalSpecies, Pet, PetManagementAssignment, User
-from app.schemas.pet import AssignmentMoveRequest, PetCreateRequest
-from app.services.lifecycle import move_pet
-from app.services.pet import create_pet, soft_delete_pet
+from app.schemas.pets import AssignmentMoveRequest, PetCreateRequest
+from app.services.pets.lifecycle import move_pet
+from app.services.pets import create_pet, soft_delete_pet
 from app.utils.datetime import utc_now
 
 
@@ -707,7 +714,7 @@ async def test_overlapping_management_assignment_is_rejected(async_session_facto
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run --project .. pytest tests/test_pet_services.py -q`
+Run: `uv run --project .. pytest tests/pets/test_services.py -q`
 
 Expected: FAIL because pet/lifecycle Service is missing。
 
@@ -739,14 +746,14 @@ Expected: FAIL because pet/lifecycle Service is missing。
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run --project .. pytest tests/test_pet_services.py -q`
+Run: `uv run --project .. pytest tests/pets/test_services.py -q`
 
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/services/pet.py app/services/lifecycle.py app/services/__init__.py tests/test_pet_services.py
+git add app/services/pets/pet.py app/services/pets/lifecycle.py app/services/__init__.py tests/pets/test_services.py
 git commit -m "feat: 实现宠物个体与生命周期服务"
 ```
 
@@ -755,10 +762,10 @@ git commit -m "feat: 实现宠物个体与生命周期服务"
 ### Task 8: 宠物域 View、路由和分页响应
 
 **Files:**
-- Create: `backend/app/views/pet.py`
+- Create: `backend/app/views/pets/`
 - Modify: `backend/app/views/__init__.py`
 - Modify: `backend/main.py`
-- Create: `backend/tests/test_pet_api.py`
+- Create: `backend/tests/pets/test_api.py`
 
 **Interfaces:**
 - Produces `pet_router`，挂载到 `/api/v1`。
@@ -795,7 +802,7 @@ async def test_pet_list_is_paginated(client) -> None:
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `uv run --project .. pytest tests/test_pet_api.py -q`
+Run: `uv run --project .. pytest tests/pets/test_api.py -q`
 
 Expected: FAIL because pet router is not mounted。
 
@@ -826,21 +833,21 @@ GET/POST/PATCH/DELETE /api/v1/pets/{pet_uuid}/origins
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `uv run --project .. pytest tests/test_pet_api.py -q`
+Run: `uv run --project .. pytest tests/pets/test_api.py -q`
 
 Expected: PASS。
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/views app/main.py main.py tests/test_pet_api.py
+git add app/views app/main.py main.py tests/pets/test_api.py
  git commit -m "feat: 暴露宠物域版本化 API"
 ```
 
 注意实际文件为 `backend/main.py`，提交命令不得加入不存在的 `app/main.py`；应使用：
 
 ```bash
-git add app/views ../main.py tests/test_pet_api.py
+git add app/views ../main.py tests/pets/test_api.py
 ```
 
 ---
@@ -849,9 +856,9 @@ git add app/views ../main.py tests/test_pet_api.py
 
 **Files:**
 - Modify: `README.md`
-- Modify: `backend/tests/test_pet_api.py`
-- Modify: `backend/tests/test_pet_selectors.py`
-- Modify: `backend/tests/test_pet_services.py`
+- Modify: `backend/tests/pets/test_api.py`
+- Modify: `backend/tests/pets/test_selectors.py`
+- Modify: `backend/tests/pets/test_services.py`
 
 **Interfaces:**
 - 产出可从 `backend` 目录启动的宠物域 API。
@@ -942,7 +949,7 @@ Expected：测试全部通过、编译成功、diff 检查无输出；确认没�
 - [ ] **Step 6: Commit**
 
 ```bash
-git add ../README.md tests/test_pet_api.py tests/test_pet_selectors.py tests/test_pet_services.py
+git add ../README.md tests/pets/test_api.py tests/pets/test_selectors.py tests/pets/test_services.py
 git commit -m "docs: 补充宠物域 API 使用与验收说明"
 ```
 

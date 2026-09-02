@@ -958,7 +958,16 @@ uv run --project .. uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
 
-认证请求使用 snake_case，拒绝 `id`/`uuid` 等未声明字段；微信登录、Redis 黑名单、PostgreSQL 迁移和前端 API 接入尚未实现。核心测试：
+已实现用户私有的宠物档案 API：
+
+- 宠物、物种、基因、识别标签的创建、查询、更新和软删除；
+- 管理单元类型与管理单元的创建、查询、更新、删除和成员查询；
+- 宠物管理单元分配、转移、解除分配与历史查询；
+- 生命周期阶段和来源谱系的创建、查询、更新、结束或删除。
+
+所有宠物域资源均按当前登录用户隔离，列表接口使用 `page` 和 `page_size` 分页。认证请求和宠物域请求拒绝 `id`、`uuid`、`user_id` 等未声明字段。
+
+微信登录、Redis 黑名单、PostgreSQL 迁移、文件上传、事件域、状态域、护理规则和前端 API 接入尚未实现。核心测试：
 
 ```bash
 cd backend
