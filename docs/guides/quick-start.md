@@ -36,13 +36,31 @@ docker compose --env-file .env -f docker/compose.yaml --profile dev up -d --wait
 docker compose --env-file .env -f docker/compose.yaml --profile dev down
 ```
 
-后端只支持 PostgreSQL。数据库结构由 Alembic 管理，启动前执行迁移：
+后端只支持 PostgreSQL。数据库结构由 Alembic 管理；Redis 仅在应用启动时初始化连接并验证可用性，当前没有业务读写 Redis，Redis 不可用不阻止后端启动。
+
+## 数据库迁移
+
+执行迁移（应用或更新数据库结构，启动后端前必须处于最新状态）：
 
 ```bash
 uv run --project . alembic upgrade head
 ```
 
-`./start-backend.sh` 会在启动 Uvicorn 前自动执行上述迁移。Redis 仅在应用启动时初始化连接并验证可用性；当前没有业务读写 Redis，Redis 不可用不阻止后端启动。
+`./start-backend.sh` 会在启动 Uvicorn 前自动执行上述迁移。
+
+查看当前迁移状态：
+
+```bash
+uv run --project . alembic current
+```
+
+修改 ORM 模型后生成新的迁移脚本：
+
+```bash
+uv run --project . alembic revision --autogenerate -m "描述本次变更"
+```
+
+生成后检查 `migrations/versions/` 中新生成的脚本内容，确认无误后再执行 `alembic upgrade head` 应用。
 
 ## 本地前后端
 
