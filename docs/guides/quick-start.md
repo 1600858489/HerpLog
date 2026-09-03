@@ -36,6 +36,14 @@ docker compose --env-file .env -f docker/compose.yaml --profile dev up -d --wait
 docker compose --env-file .env -f docker/compose.yaml --profile dev down
 ```
 
+后端只支持 PostgreSQL。数据库结构由 Alembic 管理，启动前执行迁移：
+
+```bash
+uv run --project . alembic upgrade head
+```
+
+`./start-backend.sh` 会在启动 Uvicorn 前自动执行上述迁移。Redis 仅在应用启动时初始化连接并验证可用性；当前没有业务读写 Redis，Redis 不可用不阻止后端启动。
+
 ## 本地前后端
 
 一键后台启动前后端，日志分别写入 `tmp/backend.log` 与 `tmp/frontend.log`：
@@ -63,13 +71,17 @@ http://127.0.0.1:8000/docs
 http://127.0.0.1:5173
 ```
 
-本地未设置 `DATABASE_URL` 时后端默认使用 SQLite；设置后使用 PostgreSQL。启动时仍以 SQLAlchemy `create_all()` 建表。
+本地后端通过 `.env` 中的 `DATABASE_URL` 连接 PostgreSQL，`DATABASE_URL` 必须使用 `postgresql+asyncpg://`。表结构只通过 Alembic 迁移创建，不再依赖运行时建表。
 
-运行后端检查：
+运行后端检查（使用独立测试库 `herplog_test`，避免写入开发数据）：
 
 ```bash
+docker exec docker-postgres-dev-1 createdb -U "$POSTGRES_USER" herplog_test 2>/dev/null || true
+set -a; . ./.env; set +a
+export DATABASE_URL="$TEST_DATABASE_URL"
+uv run --project . alembic upgrade head
 uv run --project . pytest -q
-uv run --project . python -m compileall backend
+uv run --project . python -m compileall backend migrations
 ```
 
 运行前端检查：

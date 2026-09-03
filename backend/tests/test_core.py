@@ -3,9 +3,31 @@ from uuid import UUID
 
 import pytest
 from pydantic import ValidationError
+from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import Settings
+
+
+
+def test_settings_accept_postgres_and_pool_configuration(monkeypatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://herplog:secret@127.0.0.1:5432/herplog")
+    monkeypatch.setenv("DATABASE_POOL_SIZE", "5")
+    monkeypatch.setenv("DATABASE_MAX_OVERFLOW", "10")
+    monkeypatch.setenv("DATABASE_POOL_TIMEOUT", "30")
+
+    settings = Settings(_env_file=None)
+
+    assert make_url(settings.database_url).drivername == "postgresql+asyncpg"
+    assert settings.database_pool_size == 5
+    assert settings.database_max_overflow == 10
+    assert settings.database_pool_timeout == 30
+
+
+def test_settings_reject_sqlite_database_url() -> None:
+    with pytest.raises(ValueError, match="PostgreSQL"):
+        Settings(_env_file=None, database_url="sqlite+aiosqlite://")
+
 from app.core.errors import ErrorCode, get_error_metadata
 from app.core.pagination import PaginationParams, build_pagination
 from app.core.response import success_response

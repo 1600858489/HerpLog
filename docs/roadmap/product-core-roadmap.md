@@ -14,7 +14,7 @@
 | 前端页面原型 | 已完成 | Today、Record、Pets、Timeline、Dashboard 页面和交互测试 |
 | 前端数据持久化 | 未开始 | 仍使用 `frontend/src/mocks/repository.ts` |
 | 事件、状态、护理计划域 | 未开始 | 没有后端模型、API 或持久化查询 |
-| 数据库迁移与生产数据库适配 | 未开始 | 开发环境仍以 SQLite 与 `create_all()` 建表 |
+| 数据库迁移与生产数据库适配 | 部分完成 | 开发/测试使用 PostgreSQL 容器，Alembic 管理迁移；Redis 仅初始化，尚无业务接入 |
 
 ## 已完成计划
 
@@ -91,9 +91,9 @@
 
 **范围：**
 
-- 引入 Alembic 迁移，停止依赖运行时 `create_all()` 管理长期数据库结构。
+- ~~引入 Alembic 迁移，停止依赖运行时 `create_all()` 管理长期数据库结构。~~ 已完成：Alembic 迁移已接入，应用启动不再建表。
 - 提供 `.env.example`，明确开发与生产所需配置、JWT 密钥要求和允许来源。
-- 验证 PostgreSQL 兼容性，并保留 SQLite 作为本地开发/测试选择。
+- ~~验证 PostgreSQL 兼容性，并保留 SQLite 作为本地开发/测试选择。~~ 已调整为 PostgreSQL-only：开发和测试均使用 PostgreSQL 容器，SQLite 已移除；Redis 客户端已初始化但暂无业务使用。
 - 增加关键 API 的端到端测试；评估文件上传、Redis 黑名单和限流的实际需求后再实施。
 
 **完成条件：**

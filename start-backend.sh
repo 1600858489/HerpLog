@@ -24,5 +24,7 @@ if [[ -f "$root_dir/.env" ]]; then
   set +a
 fi
 
+(cd "$root_dir" && uv run --project "$root_dir" alembic upgrade head)
+
 cd "$root_dir/backend"
 exec uv run --project "$root_dir" uvicorn main:app --host 127.0.0.1 --port 8000 --reload

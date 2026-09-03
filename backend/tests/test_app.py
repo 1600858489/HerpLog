@@ -1,6 +1,8 @@
 from collections.abc import Callable, Awaitable
 
+import pytest
 from fastapi import APIRouter
+from redis.exceptions import RedisError
 
 from app.core.errors import BusinessError, ErrorCode
 from main import app, lifespan
@@ -24,17 +26,47 @@ def include_test_route(path: str, handler: Callable[..., Awaitable[object]]) -> 
     app.include_router(router)
 
 
-async def test_lifespan_initializes_database(monkeypatch) -> None:
-    initialized = False
+async def test_lifespan_tolerates_redis_unavailable(monkeypatch) -> None:
+    async def fail_ping(client) -> None:
+        raise RedisError("redis unavailable")
 
-    async def fake_create_all_tables() -> None:
-        nonlocal initialized
-        initialized = True
+    disposed = False
 
-    monkeypatch.setattr("main.create_all_tables", fake_create_all_tables)
+    async def fake_dispose() -> None:
+        nonlocal disposed
+        disposed = True
+
+    monkeypatch.setattr("main.check_redis_connection", fail_ping)
+    monkeypatch.setattr("main.dispose_database", fake_dispose)
     async with lifespan(app):
-        pass
-    assert initialized
+        assert app.state.redis is None
+    assert disposed
+
+
+async def test_lifespan_closes_redis_and_database(monkeypatch) -> None:
+    closed = False
+
+    class FakeRedis:
+        async def aclose(self) -> None:
+            nonlocal closed
+            closed = True
+
+    disposed = False
+
+    async def fake_dispose() -> None:
+        nonlocal disposed
+        disposed = True
+
+    async def fake_ping(client) -> None:
+        return None
+
+    monkeypatch.setattr("main.create_redis_client", lambda: FakeRedis())
+    monkeypatch.setattr("main.check_redis_connection", fake_ping)
+    monkeypatch.setattr("main.dispose_database", fake_dispose)
+    async with lifespan(app):
+        assert isinstance(app.state.redis, FakeRedis)
+    assert closed
+    assert disposed
 
 
 async def test_validation_error_is_safe(client) -> None:
